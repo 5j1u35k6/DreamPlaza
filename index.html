@@ -1,7 +1,7 @@
 <!-- 
     CupiCho Membership Web App
-    Current Version: v25.04.47
-    Last Updated: 2025/01/07 (Hide Used Coupons & Term Fixes)
+    Current Version: v25.04.50
+    Last Updated: 2025/01/07 (Update Login Placeholder & Verify Coupon Quantities)
 -->
 <!DOCTYPE html>
 <html lang="zh-Hant">
@@ -351,7 +351,7 @@
 
     <div id="root-container">
         <div id="login-page">
-            <div class="login-container"><img src="https://i.ibb.co/tTZwQCCN/CUPC.jpg" alt="Cupicho Logo" class="logo"><h1 class="title-main">CupiCho DP會員專區</h1><h2 class="title-sub">全球精品巧克力專門店</h2><h3 class="title-store">DreamPlaza門市</h3><div class="input-group"><input type="tel" id="login-phone-input" class="form-input" placeholder="請輸入10碼電話號碼"></div><div class="button-group"><button class="btn btn-primary" id="login-button">會員登入</button><div class="divider"></div><button class="btn btn-secondary" id="register-button">會員註冊</button></div><div class="version-info">v25.04.47</div></div>
+            <div class="login-container"><img src="https://i.ibb.co/tTZwQCCN/CUPC.jpg" alt="Cupicho Logo" class="logo"><h1 class="title-main">CupiCho DP會員專區</h1><h2 class="title-sub">全球精品巧克力專門店</h2><h3 class="title-store">DreamPlaza門市</h3><div class="input-group"><input type="tel" id="login-phone-input" class="form-input" placeholder="請輸入電話號碼"></div><div class="button-group"><button class="btn btn-primary" id="login-button">會員登入</button><div class="divider"></div><button class="btn btn-secondary" id="register-button">會員註冊</button></div><div class="version-info">v25.04.50</div></div>
         </div>
         <div id="customer-home-page" class="hidden">
             <div class="customer-container">
@@ -395,7 +395,7 @@
                     <p class="info-main-data"><span id="voucher-balance">0</span><span class="small-text">杯</span></p>
                     <div class="action-buttons-group"><button class="btn btn-action" id="voucher-history-btn">寄杯查詢</button></div>
                 </div>
-                <div class="version-info">v25.04.47</div>
+                <div class="version-info">v25.04.50</div>
             </div>
         </div>
         
@@ -661,9 +661,8 @@
             // =============================================================
             // 2. 變數與常數宣告 (Variables & Constants) - 放在最上面
             // =============================================================
-            const APP_VERSION = 'v25.04.47';
-            const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzXK18jBS7tHbIKEd6lovkoi5BG3OM7wxWahw0fvgKSL_pP6OYa6c-4HsFlYdZoG5I/exec";
-
+            const APP_VERSION = 'v25.04.50';
+            const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzXK18jBS7tHbIKEd6lovkoi5BG3OM7wxWahw0fvgKSL_pP6OYa6c-4HsFlYdZoG5I/exec"
             const admins = {
                 '10427091': '7091 Arno', '10431118': '1118 Carol', '10416377': '6377 Eric',
                 '10425120': '5120 Elly', '10431938': '1938 Jewel', '10413569': '3569 Summer',
@@ -802,9 +801,25 @@
             function getCouponsForLevel(levelIdx) {
                  const coupons = [];
                  const imgMap = { '5%': 'coupon_5.png', '8%': 'coupon_8.png', '10%': 'coupon_10.png', 'americano': 'gift_americano.png', 'bogo': 'gift_bogo.png', 'gold': 'gift_gold.png' };
-                 if (levelIdx === 1) { coupons.push({ name: '美式咖啡兌換卷', qty: 1, desc: '晉升禮', img: imgMap['americano'], baseId: 'bronze_amer', type: 'americano' }); coupons.push({ name: '5% 回饋優惠卷', qty: 1, desc: '消費回饋', img: imgMap['5%'], baseId: 'bronze_5', type: 'rebate' }); coupons.push({ name: '飲品買一送一卷', qty: 1, desc: '有福同享', img: imgMap['bogo'], baseId: 'bronze_bogo', type: 'bogo' }); }
-                 else if (levelIdx === 2) { coupons.push({ name: '美式咖啡兌換卷', qty: 1, desc: '晉升禮', img: imgMap['americano'], baseId: 'silver_amer', type: 'americano' }); coupons.push({ name: '8% 回饋優惠卷', qty: 2, desc: '消費回饋', img: imgMap['8%'], baseId: 'silver_8', type: 'rebate' }); coupons.push({ name: '飲品買一送一卷', qty: 2, desc: '有福同享', img: imgMap['bogo'], baseId: 'silver_bogo', type: 'bogo' }); }
-                 else if (levelIdx === 3) { coupons.push({ name: '美式咖啡兌換卷', qty: 1, desc: '晉升禮', img: imgMap['americano'], baseId: 'gold_amer', type: 'americano' }); coupons.push({ name: '10% 回饋優惠卷', qty: 3, desc: '消費回饋', img: imgMap['10%'], baseId: 'gold_10', type: 'rebate' }); coupons.push({ name: '飲品買一送一卷', qty: 3, desc: '有福同享', img: imgMap['bogo'], baseId: 'gold_bogo', type: 'bogo' }); coupons.push({ name: '金賞好禮兌換卷', qty: 3, desc: '專屬好禮', img: imgMap['gold'], baseId: 'gold_gift', type: 'gold' }); }
+                 if (levelIdx === 1) { 
+                     // Bronze: 3 coupons total
+                     coupons.push({ name: '美式咖啡兌換卷', qty: 1, desc: '晉升禮', img: imgMap['americano'], baseId: 'bronze_amer', type: 'americano' }); 
+                     coupons.push({ name: '5% 回饋優惠卷', qty: 1, desc: '消費回饋', img: imgMap['5%'], baseId: 'bronze_5', type: 'rebate' }); 
+                     coupons.push({ name: '飲品買一送一卷', qty: 1, desc: '有福同享', img: imgMap['bogo'], baseId: 'bronze_bogo', type: 'bogo' }); 
+                 }
+                 else if (levelIdx === 2) { 
+                     // Silver: 5 coupons total
+                     coupons.push({ name: '美式咖啡兌換卷', qty: 1, desc: '晉升禮', img: imgMap['americano'], baseId: 'silver_amer', type: 'americano' }); 
+                     coupons.push({ name: '8% 回饋優惠卷', qty: 2, desc: '消費回饋', img: imgMap['8%'], baseId: 'silver_8', type: 'rebate' }); 
+                     coupons.push({ name: '飲品買一送一卷', qty: 2, desc: '有福同享', img: imgMap['bogo'], baseId: 'silver_bogo', type: 'bogo' }); 
+                 }
+                 else if (levelIdx === 3) { 
+                     // Gold: 10 coupons total
+                     coupons.push({ name: '美式咖啡兌換卷', qty: 1, desc: '晉升禮', img: imgMap['americano'], baseId: 'gold_amer', type: 'americano' }); 
+                     coupons.push({ name: '10% 回饋優惠卷', qty: 3, desc: '消費回饋', img: imgMap['10%'], baseId: 'gold_10', type: 'rebate' }); 
+                     coupons.push({ name: '飲品買一送一卷', qty: 3, desc: '有福同享', img: imgMap['bogo'], baseId: 'gold_bogo', type: 'bogo' }); 
+                     coupons.push({ name: '金賞好禮兌換卷', qty: 3, desc: '專屬好禮', img: imgMap['gold'], baseId: 'gold_gift', type: 'gold' }); 
+                 }
                  return coupons;
             }
 
@@ -832,6 +847,8 @@
                  if (!levelCard) return; 
                  const p = parseInt(points) || 0;
                  currentAnnualPoints = p;
+                 
+                 // --- 更新等級名稱 ---
                  let levelClass = 'lv0-style', levelName = '可可白賞', nextName = '可可銅賞', progressPercent = 0, pointsNeeded = 0;
                  if (p < LEVEL_THRESHOLDS.LV1) { currentLevelIndex = 0; pointsNeeded = LEVEL_THRESHOLDS.LV1 - p; progressPercent = (p / LEVEL_THRESHOLDS.LV1) * 100; }
                  else if (p < LEVEL_THRESHOLDS.LV2) { currentLevelIndex = 1; levelClass = 'lv1-style'; levelName = '可可銅賞'; nextName = '可可銀賞'; pointsNeeded = LEVEL_THRESHOLDS.LV2 - p; progressPercent = ((p - LEVEL_THRESHOLDS.LV1) / (LEVEL_THRESHOLDS.LV2 - LEVEL_THRESHOLDS.LV1)) * 100; }
@@ -855,6 +872,7 @@
                  document.getElementById('level-tooltip').textContent = pointsNeeded > 0 ? `差 ${pointsNeeded} 點晉升` : `已達最高等級`;
             }
 
+            // --- Window Exposed Functions for HTML onclick ---
             window.openMemberDetailModal = function() {
                  if(!currentCustomerPhone) return;
                  const p = currentAnnualPoints;
@@ -973,7 +991,7 @@
             function handleLogin() {
                 const inputElement = document.getElementById('login-phone-input');
                 const input = inputElement ? inputElement.value.trim() : '';
-                if (!input) { alert('請輸入電話號碼或員編'); return; }
+                if (!input) { alert('請輸入電話號碼'); return; }
 
                 if (admins[input]) {
                     currentAdminId = input; 
