@@ -1,7 +1,7 @@
 <!-- 
     CupiCho Membership Web App
-    Current Version: v25.04.57
-    Last Updated: 2025/01/07 (Fix: Cumulative Coupons Logic - Receive all previous level coupons)
+    Current Version: v25.04.59
+    Last Updated: 2025/01/07 (Update: Permanent Membership System & New Thresholds)
 -->
 <!DOCTYPE html>
 <html lang="zh-Hant">
@@ -351,7 +351,7 @@
 
     <div id="root-container">
         <div id="login-page">
-            <div class="login-container"><img src="https://i.ibb.co/tTZwQCCN/CUPC.jpg" alt="Cupicho Logo" class="logo"><h1 class="title-main">CupiCho DP會員專區</h1><h2 class="title-sub">全球精品巧克力專門店</h2><h3 class="title-store">DreamPlaza門市</h3><div class="input-group"><input type="tel" id="login-phone-input" class="form-input" placeholder="請輸入電話號碼"></div><div class="button-group"><button class="btn btn-primary" id="login-button">會員登入</button><div class="divider"></div><button class="btn btn-secondary" id="register-button">會員註冊</button></div><div class="version-info">v25.04.57</div></div>
+            <div class="login-container"><img src="https://i.ibb.co/tTZwQCCN/CUPC.jpg" alt="Cupicho Logo" class="logo"><h1 class="title-main">CupiCho DP會員專區</h1><h2 class="title-sub">全球精品巧克力專門店</h2><h3 class="title-store">DreamPlaza門市</h3><div class="input-group"><input type="tel" id="login-phone-input" class="form-input" placeholder="請輸入10碼電話號碼"></div><div class="button-group"><button class="btn btn-primary" id="login-button">會員登入</button><div class="divider"></div><button class="btn btn-secondary" id="register-button">會員註冊</button></div><div class="version-info">v25.04.59</div></div>
         </div>
         <div id="customer-home-page" class="hidden">
             <div class="customer-container">
@@ -395,7 +395,7 @@
                     <p class="info-main-data"><span id="voucher-balance">0</span><span class="small-text">杯</span></p>
                     <div class="action-buttons-group"><button class="btn btn-action" id="voucher-history-btn">寄杯查詢</button></div>
                 </div>
-                <div class="version-info">v25.04.57</div>
+                <div class="version-info">v25.04.59</div>
             </div>
         </div>
         
@@ -414,7 +414,7 @@
                 <!-- 左右分割區塊 -->
                 <div class="stats-grid">
                     <div class="stats-block points-block">
-                        <div class="annual-label">今年累計</div>
+                        <div class="annual-label">累積點數</div> <!-- 更新文字 -->
                         <div class="annual-value" id="modal-annual-value">0</div>
                         <div class="annual-unit">點</div>
                     </div>
@@ -427,8 +427,8 @@
 
                 <!-- 新增：權益說明文字 -->
                 <div class="member-notice-small" style="font-size: 0.75em; color: #888; text-align: left; margin: 10px 5px 15px 5px; line-height: 1.5;">
-                    <p>·若一次晉升兩階會員，會員優惠卷只保留最高等級之權益（例：原可可白賞會員，一次累積到20點點數直升到可可銀賞，則會直接享有銀賞之權益，無法享有可可銅賞權益）</p>
-                    <p>·當年度會員資格保留至當年度12月31日（例如2025/10/5晉升至可可金賞會員等級，則2026/1/1仍會回到可可白賞）</p>
+                    <p>·若一次晉升兩階會員，會員優惠卷只保留最高等級之權益（例：原可可白賞會員，一次累積到40點點數直升到可可銀賞，則會直接享有銀賞之權益，無法享有可可銅賞權益）</p>
+                    <p>·會員資格與累積點數採永久制，不會因年度更替而失效。</p>
                 </div>
 
                 <div class="divider"></div>
@@ -448,9 +448,9 @@
                             <tr>
                                 <td>晉升點數</td>
                                 <td class="cross-mark">✕</td>
-                                <td>10點</td>
                                 <td>20點</td>
                                 <td>40點</td>
+                                <td>100點</td>
                             </tr>
                             <tr>
                                 <td>美式兌換</td>
@@ -658,6 +658,8 @@
         window.openCouponsModal = function() {}; 
         window.openMemberDetailModal = function() {};
         window.closeModal = function(modal) { if(modal) modal.classList.add('hidden'); };
+        
+        // 修正後的頁面切換函式
         window.showPage = function(page) {
             document.querySelectorAll('#login-page, #customer-home-page, #admin-home-page').forEach(p => p.classList.add('hidden'));
             if(page) page.classList.remove('hidden');
@@ -667,8 +669,8 @@
             // =============================================================
             // 2. 變數與常數宣告 (Variables & Constants) - 放在最上面
             // =============================================================
-            const APP_VERSION = 'v25.04.57';
-            const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzXK18jBS7tHbIKEd6lovkoi5BG3OM7wxWahw0fvgKSL_pP6OYa6c-4HsFlYdZoG5I/exec";
+            const APP_VERSION = 'v25.04.59';
+            const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxInH2ktW0lcldA4CnE7UDEhj_-o2vhbBwS8CUcbPVBzyWZqK8TU3iKj7uYwx1xZ44/exec";
 
             // ★★★ 新增：年度變數 (用於優惠卷 ID 每年重置) ★★★
             const currentYear = new Date().getFullYear();
@@ -696,7 +698,8 @@
                 </svg>`;
             const CUSTOM_COUPON_IMG = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svgContent);
 
-            const LEVEL_THRESHOLDS = { LV1: 10, LV2: 20, LV3: 40 };
+            // ★★★ FIX: 更新為永久制門檻 20, 40, 100 ★★★
+            const LEVEL_THRESHOLDS = { LV1: 20, LV2: 40, LV3: 100 };
 
             const couponTerms = {
                  'americano': ['晉升禮之飲品兌換限精品美式，不限內用/外帶，冰/熱不拘。', '會員晉升禮兌換卷圖片僅供參考，實際商品以門市庫存提供為準，主辦單位保留更換等值商品或調整活動內容之權利，詳情請洽門市人員。', '其他注意事項及未盡事宜，請洽店內夥伴。', '處於「已使用」狀態的卷類無法再次使用（因顧客誤按而變為「已使用」狀態的卷類也無法再次使用）。'],
@@ -811,24 +814,20 @@
             function getCouponsForLevel(levelIdx) {
                  const coupons = [];
                  const imgMap = { '5%': 'coupon_5.png', '8%': 'coupon_8.png', '10%': 'coupon_10.png', 'americano': 'gift_americano.png', 'bogo': 'gift_bogo.png', 'gold': 'gift_gold.png' };
-                 
-                 // ★★★ FIX: Cumulative Logic (Use independent IFs) ★★★
-                 if (levelIdx >= 1) { 
-                     // Bronze
+                 if (levelIdx === 1) { 
+                     // Bronze: 3 coupons total
                      coupons.push({ name: '【銅賞】美式咖啡兌換卷', qty: 1, desc: '晉升禮', img: imgMap['americano'], baseId: 'bronze_amer', type: 'americano' }); 
                      coupons.push({ name: '【銅賞】5% 回饋優惠卷', qty: 1, desc: '消費回饋', img: imgMap['5%'], baseId: 'bronze_5', type: 'rebate' }); 
                      coupons.push({ name: '【銅賞】飲品買一送一卷', qty: 1, desc: '有福同享', img: imgMap['bogo'], baseId: 'bronze_bogo', type: 'bogo' }); 
                  }
-                 
-                 if (levelIdx >= 2) { 
-                     // Silver
+                 else if (levelIdx === 2) { 
+                     // Silver: 5 coupons total
                      coupons.push({ name: '【銀賞】美式咖啡兌換卷', qty: 1, desc: '晉升禮', img: imgMap['americano'], baseId: 'silver_amer', type: 'americano' }); 
                      coupons.push({ name: '【銀賞】8% 回饋優惠卷', qty: 2, desc: '消費回饋', img: imgMap['8%'], baseId: 'silver_8', type: 'rebate' }); 
                      coupons.push({ name: '【銀賞】飲品買一送一卷', qty: 2, desc: '有福同享', img: imgMap['bogo'], baseId: 'silver_bogo', type: 'bogo' }); 
                  }
-                 
-                 if (levelIdx >= 3) { 
-                     // Gold
+                 else if (levelIdx === 3) { 
+                     // Gold: 10 coupons total
                      coupons.push({ name: '【金賞】美式咖啡兌換卷', qty: 1, desc: '晉升禮', img: imgMap['americano'], baseId: 'gold_amer', type: 'americano' }); 
                      coupons.push({ name: '【金賞】10% 回饋優惠卷', qty: 3, desc: '消費回饋', img: imgMap['10%'], baseId: 'gold_10', type: 'rebate' }); 
                      coupons.push({ name: '【金賞】飲品買一送一卷', qty: 3, desc: '有福同享', img: imgMap['bogo'], baseId: 'gold_bogo', type: 'bogo' }); 
@@ -865,11 +864,11 @@
                  currentAnnualPoints = p;
                  
                  // --- 更新等級名稱 ---
-                 let levelClass = 'lv0-style', levelName = 'Lv.0 尋味者', nextName = 'Lv.1 嚐鮮客', progressPercent = 0, pointsNeeded = 0;
+                 let levelClass = 'lv0-style', levelName = '可可白賞', nextName = '可可銅賞', progressPercent = 0, pointsNeeded = 0;
                  if (p < LEVEL_THRESHOLDS.LV1) { currentLevelIndex = 0; pointsNeeded = LEVEL_THRESHOLDS.LV1 - p; progressPercent = (p / LEVEL_THRESHOLDS.LV1) * 100; }
-                 else if (p < LEVEL_THRESHOLDS.LV2) { currentLevelIndex = 1; levelClass = 'lv1-style'; levelName = 'Lv.1 嚐鮮客'; nextName = 'Lv.2 鑑賞家'; pointsNeeded = LEVEL_THRESHOLDS.LV2 - p; progressPercent = ((p - LEVEL_THRESHOLDS.LV1) / (LEVEL_THRESHOLDS.LV2 - LEVEL_THRESHOLDS.LV1)) * 100; }
-                 else if (p < LEVEL_THRESHOLDS.LV3) { currentLevelIndex = 2; levelClass = 'lv2-style'; levelName = 'Lv.2 鑑賞家'; nextName = 'Lv.3 品味大師'; pointsNeeded = LEVEL_THRESHOLDS.LV3 - p; progressPercent = ((p - LEVEL_THRESHOLDS.LV2) / (LEVEL_THRESHOLDS.LV3 - LEVEL_THRESHOLDS.LV2)) * 100; }
-                 else { currentLevelIndex = 3; levelClass = 'lv3-style'; levelName = 'Lv.3 品味大師'; nextName = '最高等級'; pointsNeeded = 0; progressPercent = 100; }
+                 else if (p < LEVEL_THRESHOLDS.LV2) { currentLevelIndex = 1; levelClass = 'lv1-style'; levelName = '可可銅賞'; nextName = '可可銀賞'; pointsNeeded = LEVEL_THRESHOLDS.LV2 - p; progressPercent = ((p - LEVEL_THRESHOLDS.LV1) / (LEVEL_THRESHOLDS.LV2 - LEVEL_THRESHOLDS.LV1)) * 100; }
+                 else if (p < LEVEL_THRESHOLDS.LV3) { currentLevelIndex = 2; levelClass = 'lv2-style'; levelName = '可可銀賞'; nextName = '可可金賞'; pointsNeeded = LEVEL_THRESHOLDS.LV3 - p; progressPercent = ((p - LEVEL_THRESHOLDS.LV2) / (LEVEL_THRESHOLDS.LV3 - LEVEL_THRESHOLDS.LV2)) * 100; }
+                 else { currentLevelIndex = 3; levelClass = 'lv3-style'; levelName = '可可金賞'; nextName = '最高等級'; pointsNeeded = 0; progressPercent = 100; }
 
                  const couponCountDisplay = isCouponsLoaded ? getTotalCoupons() : "-";
                  const countEl = document.getElementById('modal-coupon-count');
@@ -899,11 +898,11 @@
             window.openMemberDetailModal = function() {
                  if(!currentCustomerPhone) return;
                  const p = currentAnnualPoints;
-                 let levelName = 'Lv.0 尋味者'; let progressPercent = 0; let nextInfoText = ''; let levelColor = '#4a2c2a';
-                 if (p < LEVEL_THRESHOLDS.LV1) { levelColor = '#9E9E9E'; levelName = 'Lv.0 尋味者'; progressPercent = (p / LEVEL_THRESHOLDS.LV1) * 100; nextInfoText = `差 ${LEVEL_THRESHOLDS.LV1 - p} 點晉升 Lv.1`; } 
-                 else if (p < LEVEL_THRESHOLDS.LV2) { levelColor = '#CD7F32'; levelName = 'Lv.1 嚐鮮客'; progressPercent = ((p - LEVEL_THRESHOLDS.LV1) / (LEVEL_THRESHOLDS.LV2 - LEVEL_THRESHOLDS.LV1)) * 100; nextInfoText = `差 ${LEVEL_THRESHOLDS.LV2 - p} 點晉升 Lv.2`; }
-                 else if (p < LEVEL_THRESHOLDS.LV3) { levelColor = '#7F7F7F'; levelName = 'Lv.2 鑑賞家'; progressPercent = ((p - LEVEL_THRESHOLDS.LV2) / (LEVEL_THRESHOLDS.LV3 - LEVEL_THRESHOLDS.LV2)) * 100; nextInfoText = `差 ${LEVEL_THRESHOLDS.LV3 - p} 點晉升 Lv.3`; }
-                 else { levelColor = '#B8860B'; levelName = 'Lv.3 品味大師'; progressPercent = 100; nextInfoText = '已達最高等級'; }
+                 let levelName = '可可白賞'; let progressPercent = 0; let nextInfoText = ''; let levelColor = '#4a2c2a';
+                 if (p < LEVEL_THRESHOLDS.LV1) { levelColor = '#9E9E9E'; levelName = '可可白賞'; progressPercent = (p / LEVEL_THRESHOLDS.LV1) * 100; nextInfoText = `差 ${LEVEL_THRESHOLDS.LV1 - p} 點晉升 Lv.1`; } 
+                 else if (p < LEVEL_THRESHOLDS.LV2) { levelColor = '#CD7F32'; levelName = '可可銅賞'; progressPercent = ((p - LEVEL_THRESHOLDS.LV1) / (LEVEL_THRESHOLDS.LV2 - LEVEL_THRESHOLDS.LV1)) * 100; nextInfoText = `差 ${LEVEL_THRESHOLDS.LV2 - p} 點晉升 Lv.2`; }
+                 else if (p < LEVEL_THRESHOLDS.LV3) { levelColor = '#7F7F7F'; levelName = '可可銀賞'; progressPercent = ((p - LEVEL_THRESHOLDS.LV2) / (LEVEL_THRESHOLDS.LV3 - LEVEL_THRESHOLDS.LV2)) * 100; nextInfoText = `差 ${LEVEL_THRESHOLDS.LV3 - p} 點晉升 Lv.3`; }
+                 else { levelColor = '#B8860B'; levelName = '可可金賞'; progressPercent = 100; nextInfoText = '已達最高等級'; }
 
                  document.getElementById('modal-star-icon').innerHTML = getStarHtml(currentLevelIndex);
                  document.getElementById('modal-level-name').textContent = levelName;
