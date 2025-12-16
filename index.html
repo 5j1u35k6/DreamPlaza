@@ -295,7 +295,7 @@
                     <div class="divider"></div>
                     <button class="btn btn-secondary" id="register-button">會員註冊</button>
                 </div>
-                <div class="version-info">v25.06.16</div>
+                <div class="version-info">v25.06.17</div>
             </div>
         </div>
         
@@ -342,7 +342,7 @@
                         <button class="btn btn-action" id="voucher-history-btn">寄杯查詢</button>
                     </div>
                 </div>
-                <div class="version-info">v25.06.16</div>
+                <div class="version-info">v25.06.17</div>
             </div>
         </div>
 
@@ -450,6 +450,14 @@
             </div>
         </div>
         
+        <div id="points-history-modal" class="modal-overlay hidden">
+            <div class="modal-content">
+                <span class="close-button" onclick="closeModal(this.parentElement.parentElement)">&times;</span>
+                <h2 class="modal-title">點數紀錄</h2>
+                <div id="points-history-content" class="history-content"></div>
+            </div>
+        </div>
+        
         <div id="show-code-modal" class="modal-overlay hidden">
             <div class="modal-content">
                 <span class="close-button" onclick="closeModal(this.parentElement.parentElement)">&times;</span>
@@ -515,7 +523,7 @@
         };
 
         document.addEventListener('DOMContentLoaded', function() {
-            const APP_VERSION = 'v25.06.16';
+            const APP_VERSION = 'v25.06.17';
             const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw07qEM3zDll_N9ICPnTT1aWMmHt2qF1JRrSO6dwIih84yAwxWgyQQGfVxQmS3alj8/exec";
             const currentYear = new Date().getFullYear();
 
