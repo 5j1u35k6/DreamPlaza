@@ -295,7 +295,7 @@
                     <div class="divider"></div>
                     <button class="btn btn-secondary" id="register-button">會員註冊</button>
                 </div>
-                <div class="version-info">v25.06.15</div>
+                <div class="version-info">v25.06.16</div>
             </div>
         </div>
         
@@ -342,7 +342,7 @@
                         <button class="btn btn-action" id="voucher-history-btn">寄杯查詢</button>
                     </div>
                 </div>
-                <div class="version-info">v25.06.15</div>
+                <div class="version-info">v25.06.16</div>
             </div>
         </div>
 
@@ -456,7 +456,7 @@
                 <h2 class="modal-title">請出示給店員核銷</h2>
                 <div style="text-align: center; margin: 30px 0;">
                     <div id="verification-code-display" style="font-size: 3.5em; font-weight: bold; color: #4a2c2a; letter-spacing: 5px; font-family: monospace;"></div>
-                    <p style="color: #c0392b; font-size: 0.9em; margin-top: 15px;">(有效時間 3 分鐘)</p>
+                    <p style="color: #c0392b; font-size: 0.9em; margin-top: 15px;">有效時間倒數 <span id="countdown-timer">03:00</span></p>
                 </div>
             </div>
         </div>
@@ -515,7 +515,7 @@
         };
 
         document.addEventListener('DOMContentLoaded', function() {
-            const APP_VERSION = 'v25.06.15';
+            const APP_VERSION = 'v25.06.16';
             const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw07qEM3zDll_N9ICPnTT1aWMmHt2qF1JRrSO6dwIih84yAwxWgyQQGfVxQmS3alj8/exec";
             const currentYear = new Date().getFullYear();
 
@@ -541,6 +541,42 @@
             let currentAnnualPoints = 0, currentLevelIndex = 0, globalUsedCoupons = [], globalExtraCoupons = [], isCouponsLoaded = false;
             let html5QrCodeScanner = null, currentAdminId = null, currentCouponTab = 'unused';
             const savedPhone = localStorage.getItem('cupicho_user_phone');
+            
+            // ★★★ 新增：倒數計時變數與函式 ★★★
+            let countdownInterval = null;
+
+            function startCountdown(duration) {
+                let timer = duration, minutes, seconds;
+                const display = document.getElementById('countdown-timer');
+                
+                // 清除舊的計時器
+                if (countdownInterval) clearInterval(countdownInterval);
+
+                // 立即顯示初始時間
+                minutes = parseInt(timer / 60, 10);
+                seconds = parseInt(timer % 60, 10);
+                minutes = minutes < 10 ? "0" + minutes : minutes;
+                seconds = seconds < 10 ? "0" + seconds : seconds;
+                if (display) display.textContent = minutes + ":" + seconds;
+
+                countdownInterval = setInterval(function () {
+                    timer--; // 遞減
+                    
+                    minutes = parseInt(timer / 60, 10);
+                    seconds = parseInt(timer % 60, 10);
+
+                    minutes = minutes < 10 ? "0" + minutes : minutes;
+                    seconds = seconds < 10 ? "0" + seconds : seconds;
+
+                    if (display) display.textContent = minutes + ":" + seconds;
+
+                    if (timer < 0) {
+                        clearInterval(countdownInterval);
+                        if (display) display.textContent = "00:00";
+                        closeModal(document.getElementById('show-code-modal')); // 時間到自動關閉
+                    }
+                }, 1000);
+            }
 
             function showLoader() { document.getElementById('loading-modal').classList.remove('hidden'); }
             function hideLoader() { document.getElementById('loading-modal').classList.add('hidden'); }
@@ -778,6 +814,7 @@
                                             closeModal(document.getElementById('voucher-history-modal')); // 關閉列表
                                             openModal(document.getElementById('show-code-modal')); // 開啟驗證碼
                                             startPollingForRedemption(res.code);
+                                            startCountdown(180); // ★★★ 啟動 180 秒倒數 ★★★
                                         } else { alert('⚠️ 產生驗證碼失敗'); }
                                     }).catch(err => { hideLoader(); alert('連線錯誤'); });
                                 } else if (amount) {
@@ -812,6 +849,7 @@
                         .then(res => {
                             if(res.status === 'redeemed') {
                                 clearInterval(pollingInterval);
+                                clearInterval(countdownInterval); // 停止倒數
                                 alert('✅ 核銷成功！');
                                 closeModal(document.getElementById('show-code-modal'));
                                 // 重新整理數據
