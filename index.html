@@ -272,23 +272,22 @@
         #qr-reader { width: 90%; max-width: 400px; background: #555; border-radius: 10px; overflow: hidden; }
 
         /* ★★★ Admin Page UI Fixes ★★★ */
-        /* 1. Lookup Form: Side-by-side */
         .lookup-form {
             display: flex;
-            gap: 10px; /* Space between input and button */
+            gap: 10px;
             align-items: center;
         }
         .lookup-form .form-input {
-            flex: 1; /* Input takes remaining space */
-            margin-bottom: 0; /* Remove bottom margin if any */
+            flex: 1;
+            margin-bottom: 0;
         }
         .lookup-form .btn {
-            width: auto; /* Button fits content */
+            width: auto;
             padding: 12px 20px;
-            flex-shrink: 0; /* Prevent shrinking */
+            flex-shrink: 0;
         }
 
-        /* 2. Info Box: Side-by-side columns */
+        /* Side-by-side info columns */
         .info-box {
             display: flex;
             gap: 15px;
@@ -334,7 +333,7 @@
                     <div class="divider"></div>
                     <button class="btn btn-secondary" id="register-button">會員註冊</button>
                 </div>
-                <div class="version-info">v25.06.18</div>
+                <div class="version-info">v25.06.19</div>
             </div>
         </div>
         
@@ -381,7 +380,7 @@
                         <button class="btn btn-action" id="voucher-history-btn">寄杯查詢</button>
                     </div>
                 </div>
-                <div class="version-info">v25.06.18</div>
+                <div class="version-info">v25.06.19</div>
             </div>
         </div>
 
@@ -562,7 +561,7 @@
         };
 
         document.addEventListener('DOMContentLoaded', function() {
-            const APP_VERSION = 'v25.06.18';
+            const APP_VERSION = 'v25.06.19';
             const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw07qEM3zDll_N9ICPnTT1aWMmHt2qF1JRrSO6dwIih84yAwxWgyQQGfVxQmS3alj8/exec";
             const currentYear = new Date().getFullYear();
 
@@ -858,6 +857,13 @@
                                         hideLoader();
                                         if (res.status === 'success') {
                                             document.getElementById('verification-code-display').textContent = res.code;
+                                            
+                                            // ★★★ 重置 Modal 樣式 ★★★
+                                            const displayDiv = document.getElementById('verification-code-display');
+                                            displayDiv.style.color = '#4a2c2a'; 
+                                            displayDiv.style.fontSize = '3.5em'; 
+                                            document.getElementById('countdown-timer').parentElement.style.display = 'block'; 
+
                                             closeModal(document.getElementById('voucher-history-modal')); // 關閉列表
                                             openModal(document.getElementById('show-code-modal')); // 開啟驗證碼
                                             startPollingForRedemption(res.code);
@@ -890,26 +896,38 @@
                     attempts++;
                     if(attempts > 60) { clearInterval(pollingInterval); return; } // 3分鐘後停止
                     
-                    // 這裡預設您的 GAS 有 checkRedeemStatus 功能，若無則單純倒數不報錯
                     fetch(`${SCRIPT_URL}?action=checkRedeemStatus&code=${code}`)
                         .then(r => r.json())
                         .then(res => {
                             if(res.status === 'redeemed') {
                                 clearInterval(pollingInterval);
                                 clearInterval(countdownInterval); // 停止倒數
-                                alert('✅ 核銷成功！');
-                                closeModal(document.getElementById('show-code-modal'));
-                                // 重新整理數據
+                                
+                                // ★★★ UX 優化：介面回饋 + 自動關閉 + 自動更新數據 ★★★
+                                const displayDiv = document.getElementById('verification-code-display');
+                                if(displayDiv) {
+                                    displayDiv.innerHTML = "<span style='color:#27ae60;'>✔ 核銷成功</span>";
+                                    displayDiv.style.fontSize = "2.5em";
+                                }
+                                document.getElementById('countdown-timer').parentElement.style.display = 'none'; // 隱藏倒數計時
+
+                                // 立即更新數據
                                 if(currentCustomerPhone) {
                                      fetch(`${SCRIPT_URL}?action=query&phone=${currentCustomerPhone}`)
                                      .then(r=>r.json()).then(result => {
                                          if(result.found) {
                                              document.getElementById('voucher-balance').textContent = result.data.vouchers;
+                                             document.getElementById('points-balance').textContent = result.data.points; 
                                          }
                                      });
                                 }
+
+                                // 1.5 秒後自動關閉視窗
+                                setTimeout(() => {
+                                    closeModal(document.getElementById('show-code-modal'));
+                                }, 1500);
                             }
-                        }).catch(() => {}); // 忽略錯誤，避免干擾使用者
+                        }).catch(() => {}); 
                 }, 3000);
             }
 
