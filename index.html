@@ -24,9 +24,70 @@
             flex-direction: column;
             align-items: center;
             justify-content: flex-start; 
-            padding-top: 20px;
-            padding-bottom: 20px;
+            padding-bottom: 20px; /* 上方 padding 移除，讓跑馬燈貼頂 */
             box-sizing: border-box;
+        }
+
+        /* --- ★★★ 頂部公告欄樣式 (News Ticker) ★★★ --- */
+        #news-ticker-bar {
+            width: 100%;
+            height: 40px; /* 公告欄高度 */
+            display: flex;
+            background-color: #cb9c65; /* 右側金色背景 */
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            z-index: 1000;
+            position: relative;
+            flex-shrink: 0; /* 防止被壓縮 */
+            margin-bottom: 20px; /* 與下方內容的距離 */
+        }
+
+        .news-label {
+            width: 28%; /* 約四分之一 */
+            background-color: #6a1d7b; /* 左側紫色背景 */
+            color: #fff;
+            font-size: 0.9em;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            white-space: nowrap;
+            z-index: 10;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+        }
+
+        .news-content {
+            flex: 1; /* 佔滿剩餘空間 */
+            position: relative;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .news-list {
+            position: absolute;
+            width: 100%;
+            /* 2則消息專用動畫：總時間 6s，無限循環 */
+            animation: text-flip 6s cubic-bezier(0.23, 1, 0.32, 1) infinite;
+        }
+
+        .news-item {
+            height: 40px; /* 必須與 #news-ticker-bar 高度一致 */
+            display: flex;
+            align-items: center;
+            padding-left: 15px;
+            color: #fff;
+            font-size: 0.95em;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* 翻頁動畫關鍵影格 (2則訊息 + 1重複) */
+        @keyframes text-flip {
+            0%, 45% { transform: translateY(0px); }
+            50%, 95% { transform: translateY(-40px); }
+            100% { transform: translateY(-80px); } 
         }
 
         /* 頁面容器 */
@@ -45,7 +106,7 @@
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); 
             width: 420px; 
             max-width: 90%; 
-            margin: 20px auto; 
+            margin: 0 auto 20px auto; /* 上方 margin 改為 0，因為已有跑馬燈 */
             box-sizing: border-box; 
             position: relative;
         }
@@ -321,6 +382,18 @@
     </svg>
 
     <div id="root-container">
+        
+        <div id="news-ticker-bar">
+            <div class="news-label">門市優惠快報</div>
+            <div class="news-content">
+                <div class="news-list">
+                    <div class="news-item">測試123：憑會員QR Code享9折優惠！</div>
+                    <div class="news-item">測試456：新春禮盒預購開跑，滿千送百。</div>
+                    <div class="news-item">測試123：憑會員QR Code享9折優惠！</div>
+                </div>
+            </div>
+        </div>
+
         <div id="login-page" class="page-section">
             <div class="main-container">
                 <img src="https://i.ibb.co/tTZwQCCN/CUPC.jpg" alt="Cupicho Logo" class="logo">
@@ -333,7 +406,7 @@
                     <div class="divider"></div>
                     <button class="btn btn-secondary" id="register-button">會員註冊</button>
                 </div>
-                <div class="version-info">v25.06.20</div>
+                <div class="version-info">v25.06.21</div>
             </div>
         </div>
         
@@ -380,7 +453,7 @@
                         <button class="btn btn-action" id="voucher-history-btn">寄杯查詢</button>
                     </div>
                 </div>
-                <div class="version-info">v25.06.20</div>
+                <div class="version-info">v25.06.21</div>
             </div>
         </div>
 
@@ -562,8 +635,8 @@
         };
 
         document.addEventListener('DOMContentLoaded', function() {
-            const APP_VERSION = 'v25.06.20';
-            const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwjcx20pitrwAOGY9tgiRtr4ELpW6Og-r5CXL7NK5iKVhC-ZHZUkpFGkLPpJYJ1gmo/exec";
+            const APP_VERSION = 'v25.06.21';
+            const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw07qEM3zDll_N9ICPnTT1aWMmHt2qF1JRrSO6dwIih84yAwxWgyQQGfVxQmS3alj8/exec";
             const currentYear = new Date().getFullYear();
 
             const admins = { '10427091': '7091 Arno', '10431118': '1118 Carol', '10416377': '6377 Eric', '10425120': '5120 Elly', '10431938': '1938 Jewel', '10413569': '3569 Summer', '10426630': '6630 Elaine' };
