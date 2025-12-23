@@ -36,7 +36,7 @@
         .title-store { font-size: 1em; color: #8d6e63; margin: 5px 0 30px 0; font-weight: normal; }
         .input-group { margin-bottom: 20px; }
         .form-input { width: 100%; padding: 12px 15px; font-size: 16px; border: 1px solid #d7ccc8; border-radius: 8px; box-sizing: border-box; text-align: center; background-color: #f9f9f9; }
-        .form-input:disabled { background-color: #eee; color: #666; cursor: not-allowed; border-color: #ddd; }
+        .form-input:disabled { background-color: #e9e9e9; color: #555; cursor: not-allowed; border-color: #ccc; opacity: 0.8; }
         .button-group { display: flex; flex-direction: column; gap: 15px; }
         .btn { padding: 15px 20px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: all 0.3s ease; width: 100%; box-sizing: border-box; }
         .btn-primary { background-color: #000000; color: #cb9c65; }
@@ -44,7 +44,7 @@
         .divider { height: 1px; width: 100%; background-color: #e0e0e0; margin: 15px 0; }
         .btn-secondary { background-color: #cb9c65; color: #000000; border: none; }
         .btn-secondary:hover { background-color: #b98b54; transform: translateY(-2px); }
-        .btn-outline-red { background-color: transparent; color: #c0392b; border: 1px solid #c0392b; padding: 8px 15px; font-size: 14px; border-radius: 6px; cursor: pointer; width: auto; display: inline-block; margin-top: 15px; margin-bottom: 5px; transition: all 0.2s; }
+        .btn-outline-red { background-color: transparent; color: #c0392b; border: 1px solid #c0392b; padding: 10px 20px; font-size: 14px; border-radius: 8px; cursor: pointer; width: 100%; display: block; margin-top: 25px; margin-bottom: 10px; transition: all 0.2s; font-weight: bold; }
         .btn-outline-red:hover { background-color: #fff0f0; }
         .hidden { display: none !important; }
 
@@ -165,7 +165,7 @@
         .points-current { font-size: 1.2em; color: #333; font-weight: bold; }
         .points-expiring { font-size: 0.9em; color: #c0392b; }
         .points-disclaimer { font-size: 0.7em; color: #999; margin-bottom: 15px; text-align: left; line-height: 1.5; }
-        .version-info { margin-top: 30px; margin-bottom: 10px; font-size: 0.75em; color: #ccc; text-align: center; width: 100%; }
+        .version-info { margin-top: 20px; margin-bottom: 10px; font-size: 0.75em; color: #ccc; text-align: center; width: 100%; }
 
         .coupon-confirm-img { height: 120px; width: auto; max-width: 100%; object-fit: contain; margin-bottom: 15px; display: block; margin-left: auto; margin-right: auto; border-radius: 8px; border: 1px solid #eee; }
         .coupon-confirm-content { text-align: left; margin-bottom: 20px; font-size: 0.9em; line-height: 1.5; color: #555; }
@@ -212,11 +212,11 @@
             <div class="news-label">門市優惠快報</div>
             <div class="news-content">
                 <div class="news-list">
+                    <div class="news-item">1/1-1/31推薦朋友加入門市官方帳號，</div>
+                    <div class="news-item">雙方都可以領到美式兌換卷喔！</div>
                     <div class="news-item">晉升到可可金賞會員享10%回饋！</div>
                     <div class="news-item">可可銅賞以上會員，享有更多權益優惠</div>
-                    <div class="news-item">新春特別企劃！敬請鎖定門市社群</div>
-                    <div class="news-item">推薦朋友加入CupichoDP官方帳號，雙方都可領到美式～</div>
-                    <div class="news-item">晉升到可可金賞會員享10%回饋！</div>
+                    <div class="news-item">1/1-1/31推薦朋友加入門市官方帳號，</div>
                 </div>
             </div>
         </div>
@@ -233,7 +233,8 @@
                     <div class="divider"></div>
                     <button class="btn btn-secondary" id="register-button">會員註冊</button>
                 </div>
-                <div class="version-info">v25.06.34</div>
+                <button id="contact-support-login-btn" class="btn-outline-red">聯繫客服</button>
+                <div class="version-info">v25.10.08</div>
             </div>
         </div>
         
@@ -269,9 +270,10 @@
                         <button class="btn btn-action" id="voucher-history-btn">寄杯查詢</button>
                     </div>
                 </div>
+                
                 <button id="contact-support-btn" class="btn-outline-red">聯繫客服</button>
-                <div class="version-info">v25.06.34</div>
-            </div>
+                <div class="version-info">v25.10.08</div>
+            </div> 
         </div>
 
         <div id="member-detail-page" class="page-section hidden">
@@ -437,8 +439,8 @@
         window.onerror = function(msg, url, line) { console.error("系統錯誤:", msg, "Line:", line); };
         
         // Define all functions first (Global Scope)
-        const APP_VERSION = 'v25.06.34';
-        const SCRIPT_URL ="https://script.google.com/macros/s/AKfycbwO7gQJ4y_NaTMHbNLWgmjVusyNZo06n8y6jwaZmM_Zc_ZrjuSGgNBMgG-9zba1oXg/exec";
+        const APP_VERSION = 'v25.10.08';
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwO7gQJ4y_NaTMHbNLWgmjVusyNZo06n8y6jwaZmM_Zc_ZrjuSGgNBMgG-9zba1oXg/exec";
         const currentYear = new Date().getFullYear();
         const admins = { '10427091': '7091 Arno', '10431118': '1118 Carol', '10416377': '6377 Eric', '10425120': '5120 Elly', '10431938': '1938 Jewel', '10413569': '3569 Summer', '10426630': '6630 Elaine' };
         const CAN_SEND_COUPON_ADMINS = ['10427091']; 
@@ -447,9 +449,8 @@
         const LEVEL_THRESHOLDS = { LV1: 20, LV2: 40, LV3: 100 };
         const couponTerms = { 'americano': ['晉升禮'], 'rebate': ['回饋優惠'], 'bogo': ['買一送一'], 'gold': ['金賞禮'], 'other': ['專屬優惠'] }; 
 
-        // ★★★ Move savedPhone here (Global Scope) ★★★
+        // Global Variables
         const savedPhone = localStorage.getItem('cupicho_user_phone');
-
         let currentCustomerPhone = null, currentCustomerInfo = {}, searchedPhone = null;
         let verificationCode = null, countdownTimer = null, pollingInterval = null, pendingAddVoucherData = null, pendingPointRedeemItem = null, pendingCouponUseId = null;
         let currentAnnualPoints = 0, currentLevelIndex = 0, globalUsedCoupons = [], globalExtraCoupons = [], isCouponsLoaded = false;
@@ -474,9 +475,15 @@
             if (timeEl) timeEl.textContent = greeting; if (nameId && nameText) document.getElementById(nameId).textContent = nameText; 
         }
 
+        // ★★★ 修正返回邏輯：若沒登入則回到登入頁 ★★★
         function goBackToHome() {
-            if (currentAdminId) showPage(document.getElementById('admin-home-page'));
-            else showPage(document.getElementById('customer-home-page'));
+            if (currentAdminId) {
+                showPage(document.getElementById('admin-home-page'));
+            } else if (currentCustomerPhone) {
+                showPage(document.getElementById('customer-home-page'));
+            } else {
+                showPage(document.getElementById('login-page'));
+            }
         }
 
         function startCountdown(duration) {
@@ -522,7 +529,6 @@
         function handleRegister() { const phone = document.getElementById('reg-phone').value.trim(); const lastName = document.getElementById('reg-lastname').value.trim(); const title = document.getElementById('reg-title').value; if (!/^\d{10}$/.test(phone)) { alert('電話號碼格式錯誤'); return; } if (!lastName) { alert('請輸入姓氏'); return; } showLoader(); fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'register', phone, lastName, title }) }).then(r => r.json()).then(result => { hideLoader(); if (result.status === 'success') { alert('✅ 註冊成功！歡迎您！'); localStorage.setItem('cupicho_user_phone', phone); closeModal(document.getElementById('register-modal')); currentCustomerPhone = phone; currentCustomerInfo = { lastName, title }; showPage(document.getElementById('customer-home-page')); updateGreeting('customer-time-greeting', 'customer-name-greeting', lastName + title); document.getElementById('points-balance').textContent = 0; document.getElementById('voucher-balance').textContent = 0; updateMemberLevelUI(0); } else { alert('⚠️ ' + (result.message || '註冊失敗')); } }).catch(err => { hideLoader(); alert('🚫 網路或伺服器錯誤'); }); }
         function logout() { localStorage.removeItem('cupicho_user_phone'); window.location.reload(); }
 
-        // --- UI Update Functions ---
         function getStarHtml(levelIndex) { if (levelIndex === 0) return ''; const colors = ['', 'grad-bronze', 'grad-silver', 'grad-gold']; const starSvg = `<svg class="star-svg" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="url(#${colors[levelIndex]})" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>`; return new Array(levelIndex).fill(starSvg).join(''); }
         function updateMemberLevelUI(points) {
              const levelCard = document.getElementById('member-status-card'); if (!levelCard) return; 
@@ -569,7 +575,6 @@
              showPage(document.getElementById('member-detail-page'));
         };
 
-        // --- Coupon Logic ---
         function getCouponsForLevel(levelIdx) {
              const coupons = [];
              const imgMap = { '5%': 'coupon_5.png', '8%': 'coupon_8.png', '10%': 'coupon_10.png', 'americano': 'gift_americano.png', 'bogo': 'gift_bogo.png', 'gold': 'gift_gold.png' };
@@ -629,7 +634,6 @@
              }
         }
 
-        // --- Other Feature Functions (Redeem, History, Support) ---
         function fetchAndShowVoucherHistory(phone, nameInfo, role) {
              if (!phone) { alert('無法取得會員電話'); return; }
              const page = document.getElementById('voucher-history-page'); const contentEl = document.getElementById('voucher-history-content');
@@ -722,25 +726,57 @@
         }
 
         function openContactSupportPage() {
-            if(!currentCustomerPhone) { alert("請先登入"); return; }
-            const nameText = (currentCustomerInfo.lastName || '') + (currentCustomerInfo.title || '');
-            document.getElementById('support-phone').value = currentCustomerPhone;
-            document.getElementById('support-name').value = nameText;
+            // ★★★ 修正邏輯：如果已有登入資訊 (currentCustomerPhone)，則自動填入並鎖定 ★★★
+            if(currentCustomerPhone) {
+                const nameText = (currentCustomerInfo.lastName || '') + (currentCustomerInfo.title || '');
+                const phoneInput = document.getElementById('support-phone');
+                const nameInput = document.getElementById('support-name');
+                
+                phoneInput.value = currentCustomerPhone;
+                nameInput.value = nameText;
+                
+                // 強制鎖定，並使用 JS 設定屬性
+                phoneInput.disabled = true;
+                nameInput.disabled = true;
+                phoneInput.setAttribute('disabled', 'disabled');
+                nameInput.setAttribute('disabled', 'disabled');
+            } else {
+                // 從登入頁面進來的 (未登入)，解鎖欄位
+                const phoneInput = document.getElementById('support-phone');
+                const nameInput = document.getElementById('support-name');
+
+                phoneInput.value = '';
+                nameInput.value = '';
+                
+                phoneInput.disabled = false;
+                nameInput.disabled = false;
+                phoneInput.removeAttribute('disabled');
+                nameInput.removeAttribute('disabled');
+            }
+            
             document.getElementById('support-message').value = ''; 
             document.getElementById('support-category').value = '點數相關';
             showPage(document.getElementById('contact-support-page'));
         }
 
         function handleSendSupportRequest() {
-            const phone = document.getElementById('support-phone').value;
-            const name = document.getElementById('support-name').value;
+            const phone = document.getElementById('support-phone').value.trim();
+            const name = document.getElementById('support-name').value.trim();
             const category = document.getElementById('support-category').value;
             const message = document.getElementById('support-message').value.trim();
+            
+            if(!phone || !name) { alert("請填寫聯絡電話與稱呼"); return; }
             if(!message) { alert("請輸入詳細說明"); return; }
+            
             showLoader();
             fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'sendSupport', phone, name, category, message }) }).then(r => r.json()).then(res => {
                 hideLoader();
-                if(res.status === 'success') { alert("✅ 您的反應已送出，客服將儘速與您聯繫！"); showPage(document.getElementById('customer-home-page')); } else alert("⚠️ 送出失敗，請稍後再試。");
+                if(res.status === 'success') { 
+                    alert("✅ 您的反應已送出，客服將儘速與您聯繫！"); 
+                    // Redirect back based on login status
+                    if(currentCustomerPhone) showPage(document.getElementById('customer-home-page'));
+                    else showPage(document.getElementById('login-page'));
+                } else alert("⚠️ 送出失敗，請稍後再試。");
             }).catch(err => { hideLoader(); alert("連線錯誤"); });
         }
 
@@ -765,7 +801,7 @@
             safeBindListener('back-from-voucher-history', 'click', goBackToHome);
             safeBindListener('back-from-points-history', 'click', goBackToHome);
             safeBindListener('back-from-redeem-points', 'click', goBackToHome);
-            safeBindListener('back-from-contact-support', 'click', goBackToHome);
+            safeBindListener('back-from-contact-support', 'click', goBackToHome); // Back from support page
 
             safeBindListener('login-button', 'click', handleLogin);
             safeBindListener('register-button', 'click', () => { document.getElementById('reg-phone').value=''; openModal(document.getElementById('register-modal')); });
@@ -775,7 +811,11 @@
             safeBindListener('redeem-points-btn', 'click', openRedeemPointsPage);
             safeBindListener('points-history-btn', 'click', () => fetchAndShowPointsHistory(currentCustomerPhone));
             safeBindListener('voucher-history-btn', 'click', () => fetchAndShowVoucherHistory(currentCustomerPhone, currentCustomerInfo, 'customer'));
-            safeBindListener('contact-support-btn', 'click', openContactSupportPage);
+            
+            // ★★★ Bind BOTH support buttons ★★★
+            safeBindListener('contact-support-btn', 'click', openContactSupportPage); // Home page button
+            safeBindListener('contact-support-login-btn', 'click', openContactSupportPage); // Login page button
+            
             safeBindListener('send-support-btn', 'click', handleSendSupportRequest);
 
             safeBindListener('admin-logout-button', 'click', logout);
