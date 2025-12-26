@@ -9,11 +9,11 @@
     
     <style>
         /* --- 基礎設定 --- */
-        body, html { height: 100%; margin: 0; font-family: 'Helvetica Neue', 'Segoe UI', 'Microsoft JhengHei', 'PingFang TC', sans-serif; background-color: #f5f2eb; text-align: center; overscroll-behavior: none; }
-        #root-container { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding-bottom: 0; box-sizing: border-box; overflow: hidden; }
+        body, html { height: auto; min-height: 100%; margin: 0; font-family: 'Helvetica Neue', 'Segoe UI', 'Microsoft JhengHei', 'PingFang TC', sans-serif; background-color: #f5f2eb; text-align: center; }
+        #root-container { width: 100%; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding-bottom: 0; box-sizing: border-box; }
 
         /* --- 頂部公告欄 --- */
-        #news-ticker-bar { width: 100%; height: 40px; display: flex; background-color: #cb9c65; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.1); z-index: 1000; position: relative; flex-shrink: 0; }
+        #news-ticker-bar { width: 100%; height: 40px; display: flex; background-color: #cb9c65; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.1); z-index: 1000; position: sticky; top: 0; flex-shrink: 0; }
         .news-label { width: 28%; background-color: #6a1d7b; color: #fff; font-size: 0.9em; font-weight: bold; display: flex; align-items: center; justify-content: center; white-space: nowrap; z-index: 10; box-shadow: 2px 0 5px rgba(0,0,0,0.1); }
         .news-content { flex: 1; position: relative; height: 100%; overflow: hidden; }
         .news-list { position: absolute; width: 100%; animation: text-flip 12s cubic-bezier(0.23, 1, 0.32, 1) infinite; }
@@ -21,30 +21,36 @@
         @keyframes text-flip { 0%, 20% { transform: translateY(0px); } 25%, 45% { transform: translateY(-40px); } 50%, 70% { transform: translateY(-80px); } 75%, 95% { transform: translateY(-120px); } 100% { transform: translateY(-160px); } }
 
         /* 頁面容器 */
-        .page-section { width: 100%; height: calc(100% - 40px); display: flex; justify-content: center; box-sizing: border-box; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: 20px; }
-        .main-container { padding: 40px; border-radius: 15px; background-color: #ffffff; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); width: 420px; max-width: 90%; margin: 20px auto; box-sizing: border-box; position: relative; }
-        
+        .page-section { width: 100%; min-height: calc(100vh - 40px); display: flex; justify-content: center; align-items: flex-start; box-sizing: border-box; padding-top: 30px; padding-bottom: 50px; }
+        .main-container { display: flex; flex-direction: column; background-color: #ffffff; border-radius: 15px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); box-sizing: border-box; position: relative; width: 420px; max-width: 92%; margin: 0 auto; height: auto; min-height: auto; padding: 40px 30px; }
+
+        @media screen and (max-width: 480px) {
+            .main-container { width: 95%; padding: 30px 20px; }
+            .logo { max-width: 150px !important; margin-bottom: 15px !important; }
+            .title-main { font-size: 1.8em !important; }
+        }
+
         /* 凍結窗格專用樣式 */
-        .fixed-layout-container { height: calc(100% - 40px); max-height: 90vh; display: flex; flex-direction: column; overflow: hidden; padding: 0; }
-        .fixed-header-area { flex-shrink: 0; padding: 30px 40px 10px 40px; background-color: #fff; border-radius: 15px 15px 0 0; z-index: 20; box-shadow: 0 5px 10px rgba(0,0,0,0.02); }
-        .scrollable-content { flex: 1; overflow-y: auto; padding: 10px 40px 40px 40px; -webkit-overflow-scrolling: touch; }
+        .fixed-layout-container { height: 80vh; display: flex; flex-direction: column; overflow: hidden; padding: 0; }
+        .fixed-header-area { flex-shrink: 0; padding: 20px 20px 10px 20px; background-color: #fff; border-radius: 15px 15px 0 0; z-index: 20; box-shadow: 0 5px 10px rgba(0,0,0,0.02); }
+        .scrollable-content { flex: 1; overflow-y: auto; padding: 10px 20px 30px 20px; -webkit-overflow-scrolling: touch; }
 
         /* CSS Helpers */
         .logo { max-width: 180px; margin-bottom: 25px; display: block; margin-left: auto; margin-right: auto; }
-        .title-main { font-size: 2.0em; color: #4a2c2a; margin: 0; font-weight: bold; white-space: nowrap; }
+        .title-main { font-size: 2.0em; color: #4a2c2a; margin: 0; font-weight: bold; white-space: nowrap; letter-spacing: -0.5px; }
         .title-sub { font-size: 1.2em; color: #6d4c41; margin: 10px 0 0 0; }
         .title-store { font-size: 1em; color: #8d6e63; margin: 5px 0 30px 0; font-weight: normal; }
-        .input-group { margin-bottom: 20px; }
+        .input-group { margin-bottom: 20px; width: 100%; }
         .form-input { width: 100%; padding: 12px 15px; font-size: 16px; border: 1px solid #d7ccc8; border-radius: 8px; box-sizing: border-box; text-align: center; background-color: #f9f9f9; }
-        .form-input:disabled { background-color: #e9e9e9; color: #555; cursor: not-allowed; border-color: #ccc; opacity: 0.8; }
-        .button-group { display: flex; flex-direction: column; gap: 15px; }
+        .form-input:disabled, .form-input[readonly] { background-color: #e0e0e0 !important; color: #555 !important; cursor: not-allowed; border-color: #ccc; opacity: 1; -webkit-text-fill-color: #555; }
+        .button-group { display: flex; flex-direction: column; gap: 15px; width: 100%; }
         .btn { padding: 15px 20px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: all 0.3s ease; width: 100%; box-sizing: border-box; }
         .btn-primary { background-color: #000000; color: #cb9c65; }
         .btn-primary:hover { background-color: #333333; transform: translateY(-2px); }
-        .divider { height: 1px; width: 100%; background-color: #e0e0e0; margin: 15px 0; }
+        .divider { height: 1px; width: 100%; background-color: #e0e0e0; margin: 20px 0; }
         .btn-secondary { background-color: #cb9c65; color: #000000; border: none; }
         .btn-secondary:hover { background-color: #b98b54; transform: translateY(-2px); }
-        .btn-outline-red { background-color: transparent; color: #c0392b; border: 1px solid #c0392b; padding: 10px 20px; font-size: 14px; border-radius: 8px; cursor: pointer; width: 100%; display: block; margin-top: 25px; margin-bottom: 10px; transition: all 0.2s; font-weight: bold; }
+        .btn-outline-red { background-color: transparent; color: #c0392b; border: 1px solid #c0392b; padding: 12px; font-size: 15px; border-radius: 8px; cursor: pointer; width: 100%; display: block; margin-top: 30px; margin-bottom: 5px; transition: all 0.2s; font-weight: bold; box-sizing: border-box; }
         .btn-outline-red:hover { background-color: #fff0f0; }
         .hidden { display: none !important; }
 
@@ -185,7 +191,6 @@
         .loading-text { color: #fff; font-size: 1.2em; font-weight: bold; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* QR Scanner Container - Fixed and Restored */
         #qr-reader-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 4000; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; }
         #qr-reader { width: 90%; max-width: 400px; background: #555; border-radius: 10px; overflow: hidden; }
 
@@ -195,6 +200,51 @@
         .info-box { display: flex; gap: 15px; margin-top: 15px; }
         .info-column { flex: 1; background-color: #f9f9f9; border: 1px solid #eee; border-radius: 10px; padding: 15px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; }
         .info-column .btn-action { width: 100%; margin-top: 10px; }
+        
+        .voucher-card {
+            background-color: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.05);
+        }
+        .voucher-info {
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .voucher-icon {
+            width: 50px;
+            height: 50px;
+            background-color: #f5f2eb;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: #6a1d7b;
+        }
+        .voucher-name {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 4px;
+            display: block;
+        }
+        .voucher-count {
+            font-size: 0.9em;
+            color: #666;
+        }
+        .voucher-count strong {
+            color: #4a2c2a;
+            font-size: 1.2em;
+        }
+        
     </style>
 </head>
 <body>
@@ -215,8 +265,8 @@
                 <div class="news-list">
                     <div class="news-item">晉升到可可金賞會員享10%回饋！</div>
                     <div class="news-item">可可銅賞以上會員，享有更多權益優惠</div>
-                    <div class="news-item">1/1-1/31推薦朋友加入門市官方帳號，</div>
-                    <div class="news-item">雙方都可以領到美式兌換卷優～</div>
+                    <div class="news-item">新春特別企劃！敬請鎖定門市社群</div>
+                    <div class="news-item">推薦朋友加入CupichoDP官方帳號，雙方都可領到美式～</div>
                     <div class="news-item">晉升到可可金賞會員享10%回饋！</div>
                 </div>
             </div>
@@ -235,7 +285,7 @@
                     <button class="btn btn-secondary" id="register-button">會員註冊</button>
                 </div>
                 <button id="contact-support-login-btn" class="btn-outline-red">聯繫客服</button>
-                <div class="version-info">v25.10.10</div>
+                <div class="version-info">v25.10.16</div>
             </div>
         </div>
         
@@ -273,7 +323,7 @@
                 </div>
                 
                 <button id="contact-support-btn" class="btn-outline-red">聯繫客服</button>
-                <div class="version-info">v25.10.10</div>
+                <div class="version-info">v25.10.16</div>
             </div> 
         </div>
 
@@ -349,9 +399,14 @@
         <div id="voucher-history-page" class="page-section hidden">
             <div class="main-container fixed-layout-container">
                 <div class="fixed-header-area">
-                    <div class="header-bar"><button class="btn-back" id="back-from-voucher-history">返回</button><h2 class="title-sub" style="margin:0;">寄杯查詢</h2><div style="width:30px;"></div></div><div class="divider"></div>
+                    <div class="header-bar"><button class="btn-back" id="back-from-voucher-history">返回</button><h2 class="title-sub" style="margin:0;">寄杯查詢</h2><div style="width:30px;"></div></div>
+                    <div class="divider"></div>
+                    <div class="tabs-header">
+                        <button class="tab-btn active" data-vtab="available">可兌換</button>
+                        <button class="tab-btn" data-vtab="history">兌換紀錄</button>
+                    </div>
                 </div>
-                <div id="voucher-history-content" class="scrollable-content history-content"></div>
+                <div id="voucher-list-container" class="scrollable-content"></div>
             </div>
         </div>
 
@@ -444,7 +499,7 @@
         window.onerror = function(msg, url, line) { console.error("系統錯誤:", msg, "Line:", line); };
         
         // Define all functions first (Global Scope)
-        const APP_VERSION = 'v25.10.10';
+        const APP_VERSION = 'v25.10.16';
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwO7gQJ4y_NaTMHbNLWgmjVusyNZo06n8y6jwaZmM_Zc_ZrjuSGgNBMgG-9zba1oXg/exec";
         const currentYear = new Date().getFullYear();
         const admins = { '10427091': '7091 Arno', '10431118': '1118 Carol', '10416377': '6377 Eric', '10425120': '5120 Elly', '10431938': '1938 Jewel', '10413569': '3569 Summer', '10426630': '6630 Elaine' };
@@ -462,6 +517,9 @@
         let html5QrCodeScanner = null, currentCouponTab = 'unused';
         let countdownInterval = null, currentAdminId = null;
         
+        let currentVoucherTab = 'available';
+        let globalVoucherData = { summary: {}, history: [] };
+
         // Helper function to safely get element and bind event
         function safeBindListener(id, event, func) {
             const el = document.getElementById(id);
@@ -480,7 +538,6 @@
             if (timeEl) timeEl.textContent = greeting; if (nameId && nameText) document.getElementById(nameId).textContent = nameText; 
         }
 
-        // ★★★ 修正返回邏輯：若沒登入則回到登入頁 ★★★
         function goBackToHome() {
             if (currentAdminId) {
                 showPage(document.getElementById('admin-home-page'));
@@ -639,38 +696,147 @@
              }
         }
 
+        // ★★★ 核心修正：寄杯資料處理與分頁呈現 (Admin 自動隱藏 Tabs) ★★★
         function fetchAndShowVoucherHistory(phone, nameInfo, role) {
              if (!phone) { alert('無法取得會員電話'); return; }
-             const page = document.getElementById('voucher-history-page'); const contentEl = document.getElementById('voucher-history-content');
-             if (!page || !contentEl) return; showLoader();
-             fetch(`${SCRIPT_URL}?action=getVoucherDataForCustomer&phone=${phone}`).then(r => r.json()).then(result => {
+             const page = document.getElementById('voucher-history-page');
+             const contentEl = document.getElementById('voucher-list-container');
+             const tabsHeader = page.querySelector('.tabs-header'); // 抓取分頁標頭
+             if (!page || !contentEl) return; 
+
+             showLoader();
+             
+             fetch(`${SCRIPT_URL}?action=getVoucherDataForCustomer&phone=${phone}`)
+             .then(r => r.json())
+             .then(result => {
                  if (result.status !== 'success') { throw new Error(result.message); }
-                 contentEl.innerHTML = '';
-                 const historyData = result.data.history || []; const summaryData = result.data.summary || {}; 
-                 if (historyData.length === 0) contentEl.innerHTML = '<p style="text-align:center; color:#888;">沒有任何寄杯紀錄。</p>';
-                 else {
-                     historyData.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-                     historyData.forEach(log => {
-                         const dateObj = new Date(log.timestamp); const logDate = dateObj.toLocaleString('zh-TW', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false });
-                         const logElement = document.createElement('div'); logElement.className = 'history-item';
-                         let empRaw = admins[log.employeeId] || log.employeeId || ''; let empInfo = empRaw ? ` ${empRaw.replace(' ', '-')}` : ''; let orderInfo = (log.action === '新增' && log.orderId) ? `<br>訂單編號:${log.orderId}` : '';
-                         let detailHtml = `<span class="history-detail">${log.action} ${log.amount} 杯 - ${log.item}</span>`; let metaHtml = `<div class="history-meta" style="line-height:1.4;">${logDate}${empInfo}${orderInfo}</div>`;
-                         let actionBtn = ''; if (role === 'customer' && log.action === '新增' && summaryData[log.item] > 0) actionBtn = `<div class="history-action-group"><button class="btn-redeem" data-item="${log.item}">核銷</button><span class="history-remaining">剩餘 ${summaryData[log.item]} 杯</span></div>`;
-                         logElement.innerHTML = `<div class="history-info">${detailHtml}${metaHtml}</div>${actionBtn}`; contentEl.appendChild(logElement);
-                     });
-                     contentEl.querySelectorAll('.btn-redeem').forEach(btn => {
-                        btn.addEventListener('click', (e) => {
-                            const item = e.target.getAttribute('data-item'); const maxAmount = summaryData[item] || 0; const amount = prompt(`您要核銷幾杯「${item}」？\n(此品項還剩下 ${maxAmount} 杯可核銷)`, 1);
-                            if (amount && parseInt(amount) > 0 && parseInt(amount) <= maxAmount) {
-                                showLoader(); fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'generateRedeemCode', phone, item, amount, lastName: nameInfo.lastName, title: nameInfo.title }) }).then(r => r.json()).then(res => {
-                                    hideLoader(); if (res.status === 'success') { document.getElementById('verification-code-display').textContent = res.code; const displayDiv = document.getElementById('verification-code-display'); displayDiv.style.color = '#4a2c2a'; displayDiv.style.fontSize = '3.5em'; document.getElementById('countdown-timer').parentElement.style.display = 'block'; openModal(document.getElementById('show-code-modal')); startPollingForRedemption(res.code); startCountdown(180); } else { alert('⚠️ 產生驗證碼失敗'); }
-                                }).catch(err => { hideLoader(); alert('連線錯誤'); });
-                            } else if (amount) alert(`輸入數量無效！\n您最多只能核銷 ${maxAmount} 杯。`);
-                        });
-                     });
+                 
+                 globalVoucherData.history = result.data.history || [];
+                 globalVoucherData.summary = result.data.summary || {};
+                 
+                 if (role === 'admin') {
+                     // ★ 員工視角：隱藏分頁，強制顯示歷史 ★
+                     if(tabsHeader) tabsHeader.style.display = 'none';
+                     currentVoucherTab = 'history';
+                     renderVoucherList(nameInfo, role);
+                 } else {
+                     // ★ 顧客視角：顯示分頁，預設可兌換 ★
+                     if(tabsHeader) tabsHeader.style.display = 'flex';
+                     currentVoucherTab = 'available';
+                     updateVoucherTabUI();
+                     renderVoucherList(nameInfo, role);
                  }
-                 showPage(page); hideLoader();
-             }).catch(err => { hideLoader(); alert('查詢失敗：' + err.message); });
+
+                 showPage(page); 
+                 hideLoader();
+             })
+             .catch(err => { 
+                 hideLoader(); 
+                 alert('查詢失敗：' + err.message); 
+             });
+        }
+
+        function updateVoucherTabUI() {
+            document.querySelectorAll('.tab-btn[data-vtab]').forEach(btn => {
+                btn.classList.remove('active');
+                if(btn.getAttribute('data-vtab') === currentVoucherTab) btn.classList.add('active');
+            });
+        }
+
+        function renderVoucherList(nameInfo, role) {
+            const container = document.getElementById('voucher-list-container');
+            container.innerHTML = '';
+            
+            // 顧客看 Available
+            if (currentVoucherTab === 'available') {
+                let hasItems = false;
+                for (const [item, count] of Object.entries(globalVoucherData.summary)) {
+                    if (count > 0) {
+                        hasItems = true;
+                        const card = document.createElement('div');
+                        card.className = 'voucher-card';
+                        card.innerHTML = `
+                            <div class="voucher-info">
+                                <div class="voucher-icon">☕</div>
+                                <div>
+                                    <span class="voucher-name">${item}</span>
+                                    <span class="voucher-count">剩餘 <strong>${count}</strong> 杯</span>
+                                </div>
+                            </div>
+                            <button class="btn-redeem" data-item="${item}">核銷</button>
+                        `;
+                        card.querySelector('.btn-redeem').addEventListener('click', () => handleVoucherRedeemClick(item, count, currentCustomerPhone, nameInfo));
+                        container.appendChild(card);
+                    }
+                }
+                if (!hasItems) container.innerHTML = '<p style="text-align:center; color:#999; margin-top:30px;">目前沒有可兌換的寄杯。</p>';
+
+            } else {
+                // Admin 或 History 模式
+                const history = globalVoucherData.history.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                
+                // Admin 標題優化
+                if (role === 'admin') {
+                    container.innerHTML = '<h3 style="color:#6d4c41; margin-bottom:15px; font-size:1.1em;">詳細寄杯與核銷紀錄</h3>';
+                }
+
+                if (history.length === 0) {
+                    container.innerHTML += '<p style="text-align:center; color:#999; margin-top:30px;">尚無紀錄。</p>';
+                } else {
+                    history.forEach(log => {
+                        const dateObj = new Date(log.timestamp);
+                        const logDate = dateObj.toLocaleString('zh-TW', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false });
+                        const div = document.createElement('div');
+                        div.className = 'history-item';
+                        
+                        let actionColor = log.action === '新增' ? '#27ae60' : '#c0392b';
+                        div.innerHTML = `
+                            <div class="history-info">
+                                <span class="history-detail">${log.item}</span>
+                                <span class="history-meta">${logDate}</span>
+                            </div>
+                            <div class="history-action-group">
+                                <span style="font-weight:bold; color:${actionColor};">${log.action} ${log.amount} 杯</span>
+                            </div>
+                        `;
+                        container.appendChild(div);
+                    });
+                }
+            }
+        }
+
+        // 獨立出的核銷點擊邏輯
+        function handleVoucherRedeemClick(item, maxAmount, phone, nameInfo) {
+             const amount = prompt(`您要核銷幾杯「${item}」？\n(此品項還剩下 ${maxAmount} 杯可核銷)`, 1);
+             if (amount && parseInt(amount) > 0 && parseInt(amount) <= maxAmount) {
+                 showLoader();
+                 fetch(SCRIPT_URL, { 
+                     method: 'POST', 
+                     body: JSON.stringify({ 
+                         action: 'generateRedeemCode', 
+                         phone: currentCustomerPhone, // 使用全域變數確保正確
+                         item, 
+                         amount, 
+                         lastName: currentCustomerInfo.lastName, 
+                         title: currentCustomerInfo.title 
+                     }) 
+                 })
+                 .then(r => r.json())
+                 .then(res => {
+                     hideLoader();
+                     if (res.status === 'success') {
+                         document.getElementById('verification-code-display').textContent = res.code;
+                         document.getElementById('countdown-timer').parentElement.style.display = 'block';
+                         openModal(document.getElementById('show-code-modal'));
+                         startPollingForRedemption(res.code);
+                         startCountdown(180);
+                     } else {
+                         alert('⚠️ 產生驗證碼失敗');
+                     }
+                 }).catch(err => { hideLoader(); alert('連線錯誤'); });
+             } else if (amount) {
+                 alert(`輸入數量無效！\n您最多只能核銷 ${maxAmount} 杯。`);
+             }
         }
 
         function startPollingForRedemption(code) {
@@ -682,7 +848,13 @@
                         clearInterval(pollingInterval); clearInterval(countdownInterval);
                         const displayDiv = document.getElementById('verification-code-display'); if(displayDiv) { displayDiv.innerHTML = "<span style='color:#27ae60;'>✔ 核銷成功</span>"; displayDiv.style.fontSize = "2.5em"; } document.getElementById('countdown-timer').parentElement.style.display = 'none';
                         if(currentCustomerPhone) { fetch(`${SCRIPT_URL}?action=query&phone=${currentCustomerPhone}`).then(r=>r.json()).then(result => { if(result.found) { document.getElementById('voucher-balance').textContent = result.data.vouchers; document.getElementById('points-balance').textContent = result.data.points; } }); }
-                        setTimeout(() => { closeModal(document.getElementById('show-code-modal')); if(!document.getElementById('voucher-history-page').classList.contains('hidden')) fetchAndShowVoucherHistory(currentCustomerPhone, currentCustomerInfo, 'customer'); }, 1500);
+                        setTimeout(() => { 
+                            closeModal(document.getElementById('show-code-modal')); 
+                            // 核銷成功後重新整理當前分頁
+                            if(!document.getElementById('voucher-history-page').classList.contains('hidden')) {
+                                fetchAndShowVoucherHistory(currentCustomerPhone, currentCustomerInfo, 'customer');
+                            }
+                        }, 1500);
                     }
                 }).catch(() => {});
             }, 3000);
@@ -731,7 +903,7 @@
         }
 
         function openContactSupportPage() {
-            // ★★★ 修正邏輯：如果已有登入資訊 (currentCustomerPhone)，則自動填入並鎖定 ★★★
+            // ★★★ 修正邏輯：如果已有登入資訊 (currentCustomerPhone)，則自動填入並強制鎖定 ★★★
             if(currentCustomerPhone) {
                 const nameText = (currentCustomerInfo.lastName || '') + (currentCustomerInfo.title || '');
                 const phoneInput = document.getElementById('support-phone');
@@ -740,13 +912,18 @@
                 phoneInput.value = currentCustomerPhone;
                 nameInput.value = nameText;
                 
-                // 強制鎖定，並使用 JS 設定屬性
+                // 雙重鎖定：disabled + readonly
                 phoneInput.disabled = true;
+                phoneInput.readOnly = true;
+                
                 nameInput.disabled = true;
+                nameInput.readOnly = true;
+                
+                // JS 強制設定屬性
                 phoneInput.setAttribute('disabled', 'disabled');
                 nameInput.setAttribute('disabled', 'disabled');
             } else {
-                // 從登入頁面進來的 (未登入)，解鎖欄位
+                // 從登入頁面進來的 (未登入)，完全解鎖
                 const phoneInput = document.getElementById('support-phone');
                 const nameInput = document.getElementById('support-name');
 
@@ -754,7 +931,11 @@
                 nameInput.value = '';
                 
                 phoneInput.disabled = false;
+                phoneInput.readOnly = false;
+                
                 nameInput.disabled = false;
+                nameInput.readOnly = false;
+                
                 phoneInput.removeAttribute('disabled');
                 nameInput.removeAttribute('disabled');
             }
@@ -787,7 +968,6 @@
 
         function handleStaffConfirmPointRedeem() { if(!pendingPointRedeemItem) return; showLoader(); fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'directRedeemPoints', phone: currentCustomerPhone, item: pendingPointRedeemItem.name, amount: pendingPointRedeemItem.cost }) }).then(r => r.json()).then(res => { hideLoader(); if (res.status === 'success') { alert('✅ 兌換成功！'); document.getElementById('points-balance').textContent = res.newPoints; document.getElementById('page-current-points').textContent = res.newPoints; updateMemberLevelUI(res.annualPoints); closeModal(document.getElementById('point-redeem-confirm-modal')); } else { alert('⚠️ 兌換失敗：' + res.message); } }).catch(err => { hideLoader(); alert('連線錯誤'); }); }
         function handleVerifyStaffCodeForCoupon() { const inputCode = document.getElementById('staff-code-input').value; if (inputCode === '287719' && pendingCouponUseId) { showLoader(); fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'redeemCoupon', phone: currentCustomerPhone, couponId: pendingCouponUseId, title: '優惠卷核銷' }) }).then(r => r.json()).then(res => { hideLoader(); if (res.status === 'success') { globalUsedCoupons.push(pendingCouponUseId); alert('核銷成功！'); closeModal(document.getElementById('staff-verify-modal')); updateMemberLevelUI(currentAnnualPoints); openCouponsModal(); } else { alert('核銷失敗'); } }).catch(err => { hideLoader(); alert('連線錯誤'); }); } else { alert('核銷碼錯誤'); } }
-        
         function openQRScanner() { 
             console.log("嘗試開啟 QR Scanner...");
             const qrContainer = document.getElementById('qr-reader-container'); 
@@ -894,10 +1074,19 @@
             
             document.querySelectorAll('.tab-btn').forEach(btn => { 
                 btn.addEventListener('click', (e) => { 
-                    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); 
-                    e.target.classList.add('active'); 
-                    currentCouponTab = e.target.getAttribute('data-tab'); 
-                    updateCouponListDisplay(); 
+                    // 判斷是否為寄杯分頁 (tab-btn for vouchers)
+                    if (btn.hasAttribute('data-vtab')) {
+                        document.querySelectorAll('.tab-btn[data-vtab]').forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                        currentVoucherTab = btn.getAttribute('data-vtab');
+                        renderVoucherList(currentCustomerInfo, 'customer'); // 這裡確保用 customer 邏輯，admin 不會看到這個按鈕
+                    } else {
+                        // 這是優惠卷分頁
+                        document.querySelectorAll('.tab-btn:not([data-vtab])').forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                        currentCouponTab = btn.getAttribute('data-tab');
+                        updateCouponListDisplay();
+                    }
                 }); 
             });
             
