@@ -209,6 +209,7 @@
         .info-column { flex: 1; background-color: #f9f9f9; border: 1px solid #eee; border-radius: 10px; padding: 15px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; }
         .info-column .btn-action { width: 100%; margin-top: 10px; }
         
+        /* ★★★ 新增：寄杯卡片樣式 ★★★ */
         .voucher-card {
             background-color: #fff;
             border: 1px solid #e0e0e0;
@@ -271,12 +272,12 @@
             <div class="news-label">門市優惠快報</div>
             <div class="news-content">
                 <div class="news-list">
-                    <div class="news-item">可可銅賞以上會員，最高享10%回饋!</div>
-                    <div class="news-item">1/1-1/31推薦朋友加入門市官方帳號，</div>
+                    <div class="news-item">可可金賞會員享10%回饋！</div>
+                    <div class="news-item">可可銅賞以上會員，享有更多優惠</div>
+                    <div class="news-item">現在推薦朋友加入門市官方帳號，</div>
                     <div class="news-item">雙方都可以領到美式兌換卷!!</div>
-                    <div class="news-item">12/26-1/5 BOXING DAY!</div>
-                    <div class="news-item">官方帳號點擊「門市活動」看更多優惠</div>
-                    <div class="news-item">可可銅賞以上會員，最高享10%回饋!</div> 
+                    <div class="news-item">新春特別活動，請洽門市夥伴！</div>
+                    <div class="news-item">可可金賞會員享10%回饋！</div> 
                 </div>
             </div>
         </div>
@@ -510,7 +511,7 @@
         
         // Define all functions first (Global Scope)
         const APP_VERSION = 'v25.10.22';
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyCJaLNbUXUd-LCkhCDlSiikbIg3YnJrQUMXE7R8pFLnKgwz0w7mAvHufFE76EkCpg/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw07qEM3zDll_N9ICPnTT1aWMmHt2qF1JRrSO6dwIih84yAwxWgyQQGfVxQmS3alj8/exec";
         const currentYear = new Date().getFullYear();
         const admins = { '10427091': '7091 Arno', '10431118': '1118 Carol', '10416377': '6377 Eric', '10425120': '5120 Elly', '10431938': '1938 Jewel', '10413569': '3569 Summer', '10426630': '6630 Elaine' };
         const CAN_SEND_COUPON_ADMINS = ['10427091']; 
@@ -858,11 +859,18 @@
                         const div = document.createElement('div');
                         div.className = 'history-item';
                         
+                        // ★★★ 新增：訂單編號與員工姓名解析 ★★★
+                        const empName = admins[log.employeeId] || log.employeeId || 'System'; // 解析員工ID
+                        const orderId = log.orderId || '-'; // 若無訂單編號顯示 -
+                        const footerInfo = `${orderId} / ${empName}`;
+                        
                         let actionColor = log.action === '新增' ? '#27ae60' : '#c0392b';
+                        
                         div.innerHTML = `
                             <div class="history-info">
                                 <span class="history-detail">${log.item}</span>
                                 <span class="history-meta">${logDate}</span>
+                                <span class="history-meta" style="font-size: 0.85em; color: #888; margin-top: 2px;">${footerInfo}</span>
                             </div>
                             <div class="history-action-group">
                                 <span style="font-weight:bold; color:${actionColor};">${log.action} ${log.amount} 杯</span>
