@@ -272,12 +272,12 @@
             <div class="news-label">門市優惠快報</div>
             <div class="news-content">
                 <div class="news-list">
-                    <div class="news-item">可可銅賞以上會員，最高享10%回饋</div>
-                    <div class="news-item">1/1-1/31推薦朋友加入門市官方帳號，</div>
+                    <div class="news-item">可可金賞會員享10%回饋！</div>
+                    <div class="news-item">可可銅賞以上會員，享有更多優惠</div>
+                    <div class="news-item">現在推薦朋友加入門市官方帳號，</div>
                     <div class="news-item">雙方都可以領到美式兌換卷!!</div>
-                    <div class="news-item">uniopen聯名卡最高9折優惠</div>
-                    <div class="news-item">12/26-1/5 BOXING DAY!!</div>
-                    <div class="news-item">可可銅賞以上會員，最高享10%回饋卷!!</div> 
+                    <div class="news-item">新春特別活動，請洽門市夥伴！</div>
+                    <div class="news-item">可可金賞會員享10%回饋！</div> 
                 </div>
             </div>
         </div>
@@ -295,7 +295,7 @@
                     <button class="btn btn-secondary" id="register-button">會員註冊</button>
                 </div>
                 <button id="contact-support-login-btn" class="btn-outline-red">聯繫客服</button>
-                <div class="version-info">v25.10.22</div>
+                <div class="version-info">v25.10.25</div>
             </div>
         </div>
         
@@ -333,7 +333,7 @@
                 </div>
                 
                 <button id="contact-support-btn" class="btn-outline-red">聯繫客服</button>
-                <div class="version-info">v25.10.22</div>
+                <div class="version-info">v25.10.25</div>
             </div> 
         </div>
 
@@ -510,10 +510,12 @@
         window.onerror = function(msg, url, line) { console.error("系統錯誤:", msg, "Line:", line); };
         
         // Define all functions first (Global Scope)
-        const APP_VERSION = 'v25.10.22';
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw07qEM3zDll_N9ICPnTT1aWMmHt2qF1JRrSO6dwIih84yAwxWgyQQGfVxQmS3alj8/exec";
+        const APP_VERSION = 'v25.10.25';
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzL9Fgi6lj-PH-NDKFmSGtDLSWZ_AyWe6Z7KW7NqYqylpcpyvNJ5XwrdKk7VPjOhhU/exec";
         const currentYear = new Date().getFullYear();
-        const admins = { '10427091': '7091 Arno', '10431118': '1118 Carol', '10416377': '6377 Eric', '10425120': '5120 Elly', '10431938': '1938 Jewel', '10413569': '3569 Summer', '10426630': '6630 Elaine' };
+        // ★★★ 安全修改：移除前端的 admins 物件，改由後端驗證 ★★★
+        // const admins = { ... }; // 已移除
+        
         const CAN_SEND_COUPON_ADMINS = ['10427091']; 
         const redeemableItems = [{ cost: 2, name: "精品皮革收納籃", image: "item_2pt.png" }, { cost: 3, name: "AMEDEI冰淇淋乙杯", image: "item_3pt.jpg" }, { cost: 6, name: "精品帆布袋", image: "item_6pt.png" }, { cost: 10, name: "精品禮盒", image: "item_10pt.png" }];
         const CUSTOM_COUPON_IMG = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(`<svg width="120" height="120" xmlns="http://www.w3.org/2000/svg"><rect x="5" y="5" width="110" height="110" rx="15" ry="15" fill="none" stroke="#DAA520" stroke-width="3"/><text x="50%" y="42" dominant-baseline="middle" text-anchor="middle" font-size="36" fill="#DAA520" font-weight="bold" font-family="'Microsoft JhengHei', 'Heiti TC', sans-serif">專屬</text><text x="50%" y="82" dominant-baseline="middle" text-anchor="middle" font-size="36" fill="#DAA520" font-weight="bold" font-family="'Microsoft JhengHei', 'Heiti TC', sans-serif">優惠</text></svg>`);
@@ -598,31 +600,51 @@
             }, 1000);
         }
 
+        // ★★★ 核心修正：統一登入驗證逻辑，透過後端 API 判斷身分 ★★★
         function handleLogin() {
             const input = document.getElementById('login-phone-input').value.trim();
-            if (!input) { alert('請輸入電話號碼'); return; }
-            if (admins[input]) { 
-                currentAdminId = input; 
-                showPage(document.getElementById('admin-home-page')); 
-                updateGreeting('admin-time-greeting', 'admin-id-greeting', admins[input]); 
-                document.getElementById('lookup-results').classList.add('hidden'); 
-                const sendBtn = document.getElementById('admin-send-coupon-btn'); 
-                if(sendBtn) sendBtn.style.display = CAN_SEND_COUPON_ADMINS.includes(input) ? 'inline-block' : 'none';
-                return; 
-            }
-            currentAdminId = null; 
-            if (!/^\d{10}$/.test(input)) { alert('電話號碼格式錯誤'); return; }
+            if (!input) { alert('請輸入電話號碼或員工編號'); return; }
+            
+            // 直接呼叫後端 API 進行驗證
             showLoader(); isCouponsLoaded = false;
             fetch(`${SCRIPT_URL}?action=query&phone=${input}`).then(r=>r.json()).then(result => {
                 hideLoader();
                 if (result.status === 'success') {
+                    // ★ 判斷是否為管理員
+                    if (result.role === 'admin') {
+                        currentAdminId = result.data.id;
+                        showPage(document.getElementById('admin-home-page'));
+                        updateGreeting('admin-time-greeting', 'admin-id-greeting', result.data.name);
+                        document.getElementById('lookup-results').classList.add('hidden');
+                        
+                        // 根據後端回傳權限控制派發按鈕
+                        const sendBtn = document.getElementById('admin-send-coupon-btn');
+                        if(sendBtn) sendBtn.style.display = result.data.canSendCoupon ? 'inline-block' : 'none';
+                        return;
+                    }
+                    
+                    // ★ 若為一般顧客 (found=true)
                     if (result.found) {
-                        localStorage.setItem('cupicho_user_phone', result.data.phone); currentCustomerPhone = result.data.phone; currentCustomerInfo = { lastName: result.data.lastName, title: result.data.title };
-                        showPage(document.getElementById('customer-home-page')); updateGreeting('customer-time-greeting', 'customer-name-greeting', result.data.lastName + result.data.title);
-                        document.getElementById('points-balance').textContent = result.data.points; document.getElementById('voucher-balance').textContent = result.data.vouchers;
-                        updateMemberLevelUI(result.data.annualPoints); fetchCouponData();
-                    } else { document.getElementById('reg-phone').value = input; openModal(document.getElementById('register-modal')); }
-                } else { alert('⚠️ 系統錯誤：' + (result.message || '未知錯誤')); }
+                        currentAdminId = null;
+                        localStorage.setItem('cupicho_user_phone', result.data.phone); 
+                        currentCustomerPhone = result.data.phone; 
+                        currentCustomerInfo = { lastName: result.data.lastName, title: result.data.title };
+                        
+                        showPage(document.getElementById('customer-home-page')); 
+                        updateGreeting('customer-time-greeting', 'customer-name-greeting', result.data.lastName + result.data.title);
+                        document.getElementById('points-balance').textContent = result.data.points; 
+                        document.getElementById('voucher-balance').textContent = result.data.vouchers;
+                        updateMemberLevelUI(result.data.annualPoints); 
+                        fetchCouponData();
+                    } else { 
+                        // 查無資料，引導註冊
+                        currentAdminId = null;
+                        document.getElementById('reg-phone').value = input; 
+                        openModal(document.getElementById('register-modal')); 
+                    }
+                } else { 
+                    alert('⚠️ 系統錯誤：' + (result.message || '未知錯誤')); 
+                }
             }).catch(err => { hideLoader(); alert('🚫 網路或伺服器錯誤'); });
         }
         
@@ -860,9 +882,12 @@
                         div.className = 'history-item';
                         
                         // ★★★ 新增：訂單編號與員工姓名解析 ★★★
-                        const empName = admins[log.employeeId] || log.employeeId || 'System'; // 解析員工ID
-                        const orderId = log.orderId || '-'; // 若無訂單編號顯示 -
-                        const footerInfo = `${orderId} / ${empName}`;
+                        // ★★★ 注意：現在前端沒有 admins 清單了，直接顯示 log.employeeId (如果後端有回傳 name 最好，若無則顯示 ID)
+                        // 若您希望顯示員工名字，建議在後端回傳 history 時，就把 employeeId 轉換成 Name
+                        // 目前這裡只能顯示 ID，或是在後端做 Join
+                        const empDisplay = log.employeeId; // 暫時顯示 ID，若要顯示名字需後端配合修改
+                        const orderId = log.orderId || '-'; 
+                        const footerInfo = `${orderId} / ${empDisplay}`;
                         
                         let actionColor = log.action === '新增' ? '#27ae60' : '#c0392b';
                         
