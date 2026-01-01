@@ -12,10 +12,11 @@
         body, html { height: auto; min-height: 100%; margin: 0; font-family: 'Helvetica Neue', 'Segoe UI', 'Microsoft JhengHei', 'PingFang TC', sans-serif; background-color: #f5f2eb; text-align: center; }
         #root-container { width: 100%; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding-bottom: 0; box-sizing: border-box; }
 
-        /* --- 頂部公告欄 --- */
+        /* --- 頂部公告欄 (5則消息版) --- */
         #news-ticker-bar { width: 100%; height: 40px; display: flex; background-color: #cb9c65; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.1); z-index: 1000; position: sticky; top: 0; flex-shrink: 0; }
         .news-label { width: 28%; background-color: #6a1d7b; color: #fff; font-size: 0.9em; font-weight: bold; display: flex; align-items: center; justify-content: center; white-space: nowrap; z-index: 10; box-shadow: 2px 0 5px rgba(0,0,0,0.1); }
         .news-content { flex: 1; position: relative; height: 100%; overflow: hidden; }
+        /* 動畫時間 15s */
         .news-list { position: absolute; width: 100%; animation: text-flip 15s cubic-bezier(0.23, 1, 0.32, 1) infinite; }
         .news-item { height: 40px; display: flex; align-items: center; padding-left: 15px; color: #fff; font-size: 0.95em; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         
@@ -137,17 +138,62 @@
         #admin-send-coupon-modal .form-grid { gap: 25px; }
 
         .admin-actions { display: flex; gap: 15px; }
-        .history-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 10px; border-bottom: 1px solid #f5f5f5; text-align: left; }
-        .history-info { display: flex; flex-direction: column; gap: 2px; }
-        .history-detail { font-size: 1.1em; font-weight: bold; color: #333; }
-        .history-meta { font-size: 0.85em; color: #888; line-height: 1.4; }
-        .history-action-group { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; min-width: 80px; }
-        .history-remaining { font-size: 0.85em; color: #27ae60; margin-top: 4px; font-weight: 500; }
+        
+        /* ★★★ 寄杯紀錄樣式 (卡片列表) ★★★ */
+        .voucher-card {
+            background-color: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.05);
+        }
+        .voucher-info { text-align: left; display: flex; align-items: center; gap: 15px; }
+        .voucher-icon { width: 50px; height: 50px; background-color: #f5f2eb; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; color: #6a1d7b; }
+        .voucher-name { font-size: 1.1em; font-weight: bold; color: #333; margin-bottom: 4px; display: block; }
+        .voucher-count { font-size: 0.9em; color: #666; }
+        .voucher-count strong { color: #4a2c2a; font-size: 1.2em; }
+        
+        /* ★★★ 點數/寄杯 詳細紀錄列表樣式 (改版 v25.10.26) ★★★ */
+        .history-item { 
+            display: flex; 
+            flex-direction: column; /* 垂直排列 */
+            padding: 15px 5px; 
+            border-bottom: 1px solid #f0f0f0; 
+            text-align: left; 
+        }
+        /* 第一行：標題 (Font B: 粗體、深色) */
+        .history-title-row {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 6px;
+        }
+        /* 第二行：左右分佈 */
+        .history-meta-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+        /* 左下：日期資訊 (Font C: 細體、灰色) */
+        .history-date-info {
+            font-size: 0.85em;
+            color: #888;
+            line-height: 1.4;
+        }
+        /* 右下：點數/杯數 (Font A: 粗體、大字) */
+        .history-val-display {
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+        .val-plus { color: #27ae60; }
+        .val-minus { color: #c0392b; }
 
         .btn-redeem { padding: 8px 15px; font-size: 14px; font-weight: bold; background-color: #cb9c65; color: #000; border: none; border-radius: 5px; cursor: pointer; flex-shrink: 0; transition: background 0.2s; }
         .btn-redeem:hover { background-color: #b98b54; }
-        .btn-redeem-card { background-color: #cb9c65; color: #000; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 0.9em; transition: background 0.2s; }
-        .btn-redeem-card:hover { background-color: #b98b54; }
 
         .product-item { display: flex; align-items: center; margin-bottom: 15px; border: 1px solid #e0e0e0; border-radius: 12px; overflow: hidden; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
         .product-img-container { width: 120px; height: 120px; background-color: #fff5e6; display: flex; align-items: center; justify-content: center; border-right: 1px dashed #e0e0e0; flex-shrink: 0; }
@@ -208,52 +254,6 @@
         .info-box { display: flex; gap: 15px; margin-top: 15px; }
         .info-column { flex: 1; background-color: #f9f9f9; border: 1px solid #eee; border-radius: 10px; padding: 15px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; }
         .info-column .btn-action { width: 100%; margin-top: 10px; }
-        
-        /* ★★★ 新增：寄杯卡片樣式 ★★★ */
-        .voucher-card {
-            background-color: #fff;
-            border: 1px solid #e0e0e0;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            box-shadow: 0 3px 6px rgba(0,0,0,0.05);
-        }
-        .voucher-info {
-            text-align: left;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        .voucher-icon {
-            width: 50px;
-            height: 50px;
-            background-color: #f5f2eb;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            color: #6a1d7b;
-        }
-        .voucher-name {
-            font-size: 1.1em;
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 4px;
-            display: block;
-        }
-        .voucher-count {
-            font-size: 0.9em;
-            color: #666;
-        }
-        .voucher-count strong {
-            color: #4a2c2a;
-            font-size: 1.2em;
-        }
-        
     </style>
 </head>
 <body>
@@ -295,7 +295,7 @@
                     <button class="btn btn-secondary" id="register-button">會員註冊</button>
                 </div>
                 <button id="contact-support-login-btn" class="btn-outline-red">聯繫客服</button>
-                <div class="version-info">v25.10.25</div>
+                <div class="version-info">v25.10.26</div>
             </div>
         </div>
         
@@ -333,7 +333,7 @@
                 </div>
                 
                 <button id="contact-support-btn" class="btn-outline-red">聯繫客服</button>
-                <div class="version-info">v25.10.25</div>
+                <div class="version-info">v25.10.26</div>
             </div> 
         </div>
 
@@ -510,18 +510,17 @@
         window.onerror = function(msg, url, line) { console.error("系統錯誤:", msg, "Line:", line); };
         
         // Define all functions first (Global Scope)
-        const APP_VERSION = 'v25.10.25';
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzL9Fgi6lj-PH-NDKFmSGtDLSWZ_AyWe6Z7KW7NqYqylpcpyvNJ5XwrdKk7VPjOhhU/exec";
+        const APP_VERSION = 'v25.10.26';
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzHI846KgzZyWHf_dONdPRapUmJk6yd9KzsnBH_mfTDRY891kUU5nBEkzxiKr4_99c/exec";
         const currentYear = new Date().getFullYear();
-        // ★★★ 安全修改：移除前端的 admins 物件，改由後端驗證 ★★★
-        // const admins = { ... }; // 已移除
+        // const admins = { ... }; // 已移除，改由後端驗證
         
         const CAN_SEND_COUPON_ADMINS = ['10427091']; 
         const redeemableItems = [{ cost: 2, name: "精品皮革收納籃", image: "item_2pt.png" }, { cost: 3, name: "AMEDEI冰淇淋乙杯", image: "item_3pt.jpg" }, { cost: 6, name: "精品帆布袋", image: "item_6pt.png" }, { cost: 10, name: "精品禮盒", image: "item_10pt.png" }];
         const CUSTOM_COUPON_IMG = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(`<svg width="120" height="120" xmlns="http://www.w3.org/2000/svg"><rect x="5" y="5" width="110" height="110" rx="15" ry="15" fill="none" stroke="#DAA520" stroke-width="3"/><text x="50%" y="42" dominant-baseline="middle" text-anchor="middle" font-size="36" fill="#DAA520" font-weight="bold" font-family="'Microsoft JhengHei', 'Heiti TC', sans-serif">專屬</text><text x="50%" y="82" dominant-baseline="middle" text-anchor="middle" font-size="36" fill="#DAA520" font-weight="bold" font-family="'Microsoft JhengHei', 'Heiti TC', sans-serif">優惠</text></svg>`);
         const LEVEL_THRESHOLDS = { LV1: 20, LV2: 40, LV3: 100 };
         
-        // ★★★ 恢復完整條款內容 ★★★
+        // 恢復完整條款內容
         const couponTerms = {
             'americano': [
                 '晉升禮之飲品兌換限精品美式，不限內用/外帶，冰/熱不拘。',
@@ -600,7 +599,6 @@
             }, 1000);
         }
 
-        // ★★★ 核心修正：統一登入驗證逻辑，透過後端 API 判斷身分 ★★★
         function handleLogin() {
             const input = document.getElementById('login-phone-input').value.trim();
             if (!input) { alert('請輸入電話號碼或員工編號'); return; }
@@ -617,7 +615,6 @@
                         updateGreeting('admin-time-greeting', 'admin-id-greeting', result.data.name);
                         document.getElementById('lookup-results').classList.add('hidden');
                         
-                        // 根據後端回傳權限控制派發按鈕
                         const sendBtn = document.getElementById('admin-send-coupon-btn');
                         if(sendBtn) sendBtn.style.display = result.data.canSendCoupon ? 'inline-block' : 'none';
                         return;
@@ -881,11 +878,8 @@
                         const div = document.createElement('div');
                         div.className = 'history-item';
                         
-                        // ★★★ 新增：訂單編號與員工姓名解析 ★★★
-                        // ★★★ 注意：現在前端沒有 admins 清單了，直接顯示 log.employeeId (如果後端有回傳 name 最好，若無則顯示 ID)
-                        // 若您希望顯示員工名字，建議在後端回傳 history 時，就把 employeeId 轉換成 Name
-                        // 目前這裡只能顯示 ID，或是在後端做 Join
-                        const empDisplay = log.employeeId; // 暫時顯示 ID，若要顯示名字需後端配合修改
+                        // 訂單編號與員工姓名解析
+                        const empDisplay = log.employeeId; 
                         const orderId = log.orderId || '-'; 
                         const footerInfo = `${orderId} / ${empDisplay}`;
                         
@@ -982,21 +976,53 @@
             }).catch(err => { hideLoader(); alert('🚫 網路或伺服器錯誤'); }); 
         }
         
+        // ★★★ 更新：fetchAndShowPointsHistory (顯示到期日樣式) ★★★
         function fetchAndShowPointsHistory(phone) { 
-            if (!phone) { alert('無法取得會員電話'); return; } 
-            const page = document.getElementById('points-history-page'); const contentEl = document.getElementById('points-history-content');
-            if (!page || !contentEl) return; showLoader(); 
-            fetch(`${SCRIPT_URL}?action=getPointsHistory&phone=${phone}`).then(r => r.json()).then(result => { 
+             if (!phone) { alert('無法取得會員電話'); return; } 
+             const page = document.getElementById('points-history-page'); const contentEl = document.getElementById('points-history-content');
+             if (!page || !contentEl) return; showLoader(); 
+             
+             // 改為呼叫 handleGetPointsHistory (後端已更新為讀取 PointsDetail + Log)
+             fetch(`${SCRIPT_URL}?action=getPointsHistory&phone=${phone}`)
+             .then(r => r.json())
+             .then(result => { 
                 hideLoader(); 
                 if (result.status === 'success') { 
                     contentEl.innerHTML = ''; 
-                    if (result.data.length === 0) contentEl.innerHTML = '<p style="text-align:center; color:#888;">沒有任何點數紀錄。</p>'; 
-                    else { 
+                    if (result.data.length === 0) {
+                        contentEl.innerHTML = '<p style="text-align:center; color:#888;">沒有任何點數紀錄。</p>'; 
+                    } else { 
                         result.data.forEach(log => { 
-                            const logDate = new Date(log.timestamp).toLocaleString('zh-TW', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false }); 
-                            const logElement = document.createElement('div'); logElement.className = 'history-item'; 
-                            logElement.innerHTML = ` <div class="history-info"> <span class="history-date">${logDate}</span> <span class="history-detail" style="font-weight:bold; color:#4a2c2a;">${log.item || '未知項目'}</span> <span class="history-detail" style="font-size:0.9em; color:#666;">${log.memo}</span> </div> `; 
-                            contentEl.appendChild(logElement); 
+                            // 判斷正負，給予顏色樣式
+                            let valClass = 'history-val-display';
+                            let valSign = '';
+                            if (log.points > 0) {
+                                valClass += ' val-plus';
+                                valSign = '+';
+                            } else if (log.points < 0) {
+                                valClass += ' val-minus';
+                                valSign = ''; // 負號本身會有
+                            }
+
+                            // 處理到期日顯示
+                            let expiryHtml = '';
+                            if (log.expiryStr) {
+                                expiryHtml = `<br>到期: ${log.expiryStr.split(' ')[0]}`; // 只顯示日期 yyyy/MM/dd
+                            }
+
+                            const div = document.createElement('div');
+                            div.className = 'history-item';
+                            div.innerHTML = `
+                                <div class="history-title-row">${log.title}</div>
+                                <div class="history-meta-row">
+                                    <div class="history-date-info">
+                                        發放: ${log.dateStr}
+                                        ${expiryHtml}
+                                    </div>
+                                    <div class="${valClass}">${valSign}${log.points} 點</div>
+                                </div>
+                            `;
+                            contentEl.appendChild(div); 
                         }); 
                     } 
                     showPage(page); 
