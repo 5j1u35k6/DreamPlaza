@@ -527,7 +527,7 @@
         
         // Define all functions first (Global Scope)
         const APP_VERSION = 'v26.01.14';
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxQHRdPr2DgV2cWAsPYP4DDDdlovwBJA_SyV6ojSZSLXU3ExgC2R4eWleJTnP8DE2c/exec;
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxQHRdPr2DgV2cWAsPYP4DDDdlovwBJA_SyV6ojSZSLXU3ExgC2R4eWleJTnP8DE2c/exec";
         const currentYear = new Date().getFullYear();
         
         const CAN_SEND_COUPON_ADMINS = ['10427091']; 
@@ -1273,24 +1273,31 @@
             const targetModeSelect = document.getElementById('send-target-mode');
             if(targetModeSelect) targetModeSelect.addEventListener('change', (e) => { const ph = document.getElementById('target-phone-group'); const lv = document.getElementById('target-level-group'); if(e.target.value === 'phone') { ph.classList.remove('hidden'); lv.classList.add('hidden'); } else { ph.classList.add('hidden'); lv.classList.remove('hidden'); } });
 
-            // ★★★ LIFF 初始化與登入檢查 (加上錯誤捕捉) ★★★
+            // ★★★ LIFF 初始化與登入檢查 (強化除錯狀態顯示) ★★★
             showLoader(); 
+            const statusEl = document.getElementById('line-auth-status');
             
             try {
                 if (LIFF_ID && LIFF_ID !== "YOUR_LIFF_ID_HERE") {
+                    if(statusEl) statusEl.textContent = 'LINE 狀態: 啟動 LIFF SDK...';
+                    
                     liff.init({ liffId: LIFF_ID }).then(() => {
+                        if(statusEl) statusEl.textContent = 'LINE 狀態: LIFF 初始化成功，檢查環境...';
+                        
                         if (liff.isLoggedIn() || liff.isInClient()) {
+                            if(statusEl) statusEl.textContent = 'LINE 狀態: 正在取得使用者資料...';
+                            
                             liff.getProfile().then(profile => {
                                 currentLineUid = profile.userId;
                                 
                                 // 更新狀態指示器：已授權
-                                const statusEl = document.getElementById('line-auth-status');
-                                if(statusEl) statusEl.textContent = 'LINE 狀態: 已授權 (' + profile.userId.substring(0,5) + '...)';
+                                if(statusEl) statusEl.textContent = 'LINE 狀態: 已授權，連線後端中... (' + profile.userId.substring(0,5) + '...)';
 
                                 fetch(`${SCRIPT_URL}?action=checkLiff&uid=${currentLineUid}`)
                                 .then(r=>r.json()).then(res => {
                                     hideLoader();
                                     if(res.status === 'success' && res.found) {
+                                        if(statusEl) statusEl.textContent = 'LINE 狀態: 綁定成功，自動登入';
                                         currentAdminId = null;
                                         localStorage.setItem('cupicho_user_phone', res.data.phone); 
                                         currentCustomerPhone = res.data.phone; 
@@ -1302,18 +1309,19 @@
                                         updateMemberLevelUI(res.data.annualPoints); 
                                         fetchCouponData();
                                     } else {
+                                        if(statusEl) statusEl.textContent = 'LINE 狀態: 尚未綁定，請手動登入';
                                         checkLocalLogin();
                                     }
                                 }).catch((e) => { 
                                     hideLoader(); 
+                                    if(statusEl) { statusEl.textContent = 'LINE 狀態: 後端連線失敗'; statusEl.style.color = '#c0392b'; }
                                     checkLocalLogin(); 
                                     console.error("Fetch API 失敗:", e);
                                 });
                             }).catch((e) => { 
                                 hideLoader(); 
-                                const statusEl = document.getElementById('line-auth-status');
                                 if(statusEl) {
-                                    statusEl.textContent = 'LINE 狀態: 讀取失敗';
+                                    statusEl.textContent = 'LINE 狀態: 讀取個人資料失敗 (' + e.message + ')';
                                     statusEl.style.color = '#c0392b';
                                 }
                                 checkLocalLogin(); 
@@ -1321,7 +1329,6 @@
                             });
                         } else {
                             hideLoader();
-                            const statusEl = document.getElementById('line-auth-status');
                             if(statusEl) {
                                 statusEl.textContent = 'LINE 狀態: 未登入或外部瀏覽器';
                                 statusEl.style.color = '#888';
@@ -1330,6 +1337,10 @@
                         }
                     }).catch((err) => { 
                         hideLoader(); 
+                        if(statusEl) { 
+                            statusEl.textContent = 'LINE 狀態: LIFF 錯誤 (' + err.code + ': ' + err.message + ')'; 
+                            statusEl.style.color = '#c0392b'; 
+                        }
                         checkLocalLogin(); 
                         console.error("LIFF init 失敗:", err);
                         const dp = document.getElementById('debug-panel');
@@ -1337,7 +1348,6 @@
                     });
                 } else {
                     hideLoader();
-                    const statusEl = document.getElementById('line-auth-status');
                     if(statusEl) {
                         statusEl.textContent = 'LINE 狀態: 尚未設定 ID';
                         statusEl.style.color = '#888';
@@ -1346,6 +1356,10 @@
                 }
             } catch (fatalError) {
                 hideLoader();
+                if(statusEl) { 
+                    statusEl.textContent = 'LINE 狀態: 嚴重錯誤 (' + fatalError.message + ')'; 
+                    statusEl.style.color = '#c0392b'; 
+                }
                 checkLocalLogin();
                 const dp = document.getElementById('debug-panel');
                 if (dp) { dp.style.display = 'block'; dp.innerHTML += `<div>重大錯誤: ${fatalError.message}</div>`; }
