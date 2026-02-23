@@ -1,6 +1,6 @@
 <!-- 
     CupiCho Membership Web App
-    Current Version: v26.01.12 (Feat: LINE LIFF Auto-Login Integration)
+    Current Version: v26.01.13 (Fix: LIFF ID Pre-filled & Error Catching)
     Last Updated: 2026/02/23
 -->
 <!DOCTYPE html>
@@ -243,9 +243,18 @@
         .info-box { display: flex; gap: 15px; margin-top: 15px; }
         .info-column { flex: 1; background-color: #f9f9f9; border: 1px solid #eee; border-radius: 10px; padding: 15px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; }
         .info-column .btn-action { width: 100%; margin-top: 10px; }
+        
+        /* 偵錯模式區塊 (預設隱藏，發生錯誤時顯示) */
+        #debug-panel {
+            position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(255,0,0,0.9);
+            color: white; padding: 10px; font-size: 12px; z-index: 9999;
+            text-align: left; max-height: 30vh; overflow-y: auto; display: none;
+        }
     </style>
 </head>
 <body>
+    <div id="debug-panel"></div> <!-- 偵錯顯示區塊 -->
+    
     <svg style="position: absolute; width: 0; height: 0; overflow: hidden;" version="1.1" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <linearGradient id="grad-white" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#F5E6D3; stop-opacity:1"/><stop offset="50%" style="stop-color:#FFFFFF; stop-opacity:1"/><stop offset="100%" style="stop-color:#FAF0E6; stop-opacity:1"/></linearGradient>
@@ -284,7 +293,7 @@
                     <button class="btn btn-secondary" id="register-button">會員註冊</button>
                 </div>
                 <button id="contact-support-login-btn" class="btn-outline-red">聯繫客服</button>
-                <div class="version-info">v26.01.12</div>
+                <div class="version-info">v26.01.13</div>
             </div>
         </div>
         
@@ -322,7 +331,7 @@
                 </div>
                 
                 <button id="contact-support-btn" class="btn-outline-red">聯繫客服</button>
-                <div class="version-info">v26.01.12</div>
+                <div class="version-info">v26.01.13</div>
             </div> 
         </div>
 
@@ -504,11 +513,19 @@
     
     <script>
         // Global Error Trap
-        window.onerror = function(msg, url, line) { console.error("系統錯誤:", msg, "Line:", line); };
+        window.onerror = function(msg, url, line) { 
+            // 如果發生錯誤，顯示在 debug 面板
+            const debugPanel = document.getElementById('debug-panel');
+            if (debugPanel) {
+                debugPanel.style.display = 'block';
+                debugPanel.innerHTML += `<div>[錯誤] ${msg} (行 ${line})</div>`;
+            }
+            console.error("系統錯誤:", msg, "Line:", line); 
+        };
         
         // Define all functions first (Global Scope)
-        const APP_VERSION = 'v26.01.12';
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxQHRdPr2DgV2cWAsPYP4DDDdlovwBJA_SyV6ojSZSLXU3ExgC2R4eWleJTnP8DE2c/exec";
+        const APP_VERSION = 'v26.01.13';
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwQCy9ej3nsilcx2YI_2XjCLoccmrq7QqiJ0KYN1CMw4CNuLnNaSlY5ELJSebJFnAw/exec";
         const currentYear = new Date().getFullYear();
         
         const CAN_SEND_COUPON_ADMINS = ['10427091']; 
@@ -536,8 +553,8 @@
         let currentVoucherTab = 'available';
         let globalVoucherData = { summary: {}, history: [] };
 
-        // ★★★ LIFF ID 設定 (您之後可以替換成您自己的 LIFF ID) ★★★
-        const LIFF_ID = 2009202400-cq7s9ItH; 
+        // ★★★ LIFF ID 設定 ★★★
+        const LIFF_ID = "2009202400-cq7s9ItH"; 
         let currentLineUid = null;
 
         function safeBindListener(id, event, func) {
@@ -575,13 +592,11 @@
             }, 1000);
         }
 
-        // ★★★ 更新：登入時帶入 LIFF UID ★★★
         function handleLogin() {
             const input = document.getElementById('login-phone-input').value.trim();
             if (!input) { alert('請輸入電話號碼或員工編號'); return; }
             
             showLoader(); isCouponsLoaded = false;
-            // 呼叫 API，並帶上 UID (如果有)
             let apiUrl = `${SCRIPT_URL}?action=query&phone=${input}`;
             if (currentLineUid) apiUrl += `&uid=${currentLineUid}`;
 
@@ -625,7 +640,6 @@
             if (!lastName) { alert('請輸入姓氏'); return; } 
             
             showLoader(); 
-            // ★★★ 註冊時也帶上 UID 綁定 ★★★
             const payload = { action: 'register', phone, lastName, title, uid: currentLineUid };
             fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) })
             .then(r => r.json())
@@ -1176,8 +1190,9 @@
         function handleFinalConfirmRedeem() { const employeeId = document.getElementById('admin-redeem-employee-id').value; showLoader(); fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'processRedemption', step: 'confirm', code: verificationCode, employeeId }) }).then(r => r.json()).then(result => { hideLoader(); if(result.status === 'success') { alert('核銷成功'); closeModal(document.getElementById('admin-confirm-redeem-modal')); if(searchedPhone) handleAdminLookup(); } else { alert('核銷失敗'); } }).catch(() => { hideLoader(); alert('連線錯誤'); }); }
         function handleAdminSendCoupon() { const phone = document.getElementById('send-coupon-phone').value.trim(); const typeSelect = document.getElementById('send-coupon-type'); let type = typeSelect.value; const qty = parseInt(document.getElementById('send-coupon-qty').value); const targetMode = document.getElementById('send-target-mode').value; const expiryInput = document.getElementById('send-coupon-expiry').value; if (type === 'other') { const customName = document.getElementById('send-coupon-custom-name').value.trim(); if (!customName) { alert('請輸入優惠卷名稱'); return; } type = `other:${customName}`; } let payload = { action: 'sendCoupon', type, qty, employeeId: currentAdminId, targetMode, expiry: expiryInput, desc: document.getElementById('send-coupon-desc').value.trim() }; if (targetMode === 'phone') { if (!phone || !/^\d{10}$/.test(phone)) { alert('請輸入正確電話'); return; } payload.phone = phone; } else { payload.level = document.getElementById('send-coupon-level').value; } if (!type || !qty) { alert('請填寫完整'); return; } if (targetMode === 'level' && !confirm(`確定要派發給「${document.getElementById('send-coupon-level').selectedOptions[0].text}」嗎？`)) return; showLoader(); fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) }).then(r => r.json()).then(res => { hideLoader(); if(res.status === 'success') { alert('✅ 派發成功！'); closeModal(document.getElementById('admin-send-coupon-modal')); } else { alert('⚠️ 派發失敗：' + res.message); } }).catch(() => { hideLoader(); alert('連線錯誤'); }); }
 
-        // ★★★ LIFF 初始化與登入整合 ★★★
+        // ★★★ 事件綁定與 LIFF 初始化 ★★★
         document.addEventListener('DOMContentLoaded', function() {
+            // 先完成所有的按鈕綁定 (這一定要先做)
             safeBindListener('member-status-card', 'click', window.showMemberDetailPage);
             safeBindListener('back-to-home-btn', 'click', () => { showPage(document.getElementById('customer-home-page')); });
             safeBindListener('back-from-voucher-history', 'click', goBackToHome);
@@ -1256,48 +1271,63 @@
             const targetModeSelect = document.getElementById('send-target-mode');
             if(targetModeSelect) targetModeSelect.addEventListener('change', (e) => { const ph = document.getElementById('target-phone-group'); const lv = document.getElementById('target-level-group'); if(e.target.value === 'phone') { ph.classList.remove('hidden'); lv.classList.add('hidden'); } else { ph.classList.add('hidden'); lv.classList.remove('hidden'); } });
 
-            // ★★★ LIFF 初始化與登入檢查 ★★★
-            // 若您尚未取得 LIFF ID，或是想要在一般瀏覽器測試，下面的邏輯仍會相容
+            // ★★★ LIFF 初始化與登入檢查 (加上錯誤捕捉) ★★★
             showLoader(); 
             
-            // 如果你把 LIFF_ID 填上去了，就可以啟用這段
-            if (LIFF_ID && LIFF_ID !== "YOUR_LIFF_ID_HERE") {
-                liff.init({ liffId: LIFF_ID }).then(() => {
-                    if (liff.isLoggedIn() || liff.isInClient()) {
-                        liff.getProfile().then(profile => {
-                            currentLineUid = profile.userId;
-                            // 用 LINE UID 去後端問看看有沒有綁定過
-                            fetch(`${SCRIPT_URL}?action=checkLiff&uid=${currentLineUid}`)
-                            .then(r=>r.json()).then(res => {
-                                hideLoader();
-                                if(res.status === 'success' && res.found) {
-                                    // 有綁定過！直接登入
-                                    currentAdminId = null;
-                                    localStorage.setItem('cupicho_user_phone', res.data.phone); 
-                                    currentCustomerPhone = res.data.phone; 
-                                    currentCustomerInfo = { lastName: res.data.lastName, title: res.data.title };
-                                    showPage(document.getElementById('customer-home-page')); 
-                                    updateGreeting('customer-time-greeting', 'customer-name-greeting', res.data.lastName + res.data.title);
-                                    document.getElementById('points-balance').textContent = res.data.points; 
-                                    document.getElementById('voucher-balance').textContent = res.data.vouchers;
-                                    updateMemberLevelUI(res.data.annualPoints); 
-                                    fetchCouponData();
-                                } else {
-                                    // 沒綁定過，顯示登入頁面，讓他輸入電話來綁定
-                                    checkLocalLogin();
-                                }
-                            }).catch(() => { hideLoader(); checkLocalLogin(); });
-                        }).catch(() => { hideLoader(); checkLocalLogin(); });
-                    } else {
-                        // 在外部瀏覽器，且沒登入 LINE
-                        hideLoader();
-                        checkLocalLogin();
-                    }
-                }).catch(() => { hideLoader(); checkLocalLogin(); });
-            } else {
-                // 如果還沒設定 LIFF，就走原本的 localStorage 登入
+            try {
+                if (LIFF_ID && LIFF_ID !== "YOUR_LIFF_ID_HERE") {
+                    liff.init({ liffId: LIFF_ID }).then(() => {
+                        if (liff.isLoggedIn() || liff.isInClient()) {
+                            liff.getProfile().then(profile => {
+                                currentLineUid = profile.userId;
+                                fetch(`${SCRIPT_URL}?action=checkLiff&uid=${currentLineUid}`)
+                                .then(r=>r.json()).then(res => {
+                                    hideLoader();
+                                    if(res.status === 'success' && res.found) {
+                                        currentAdminId = null;
+                                        localStorage.setItem('cupicho_user_phone', res.data.phone); 
+                                        currentCustomerPhone = res.data.phone; 
+                                        currentCustomerInfo = { lastName: res.data.lastName, title: res.data.title };
+                                        showPage(document.getElementById('customer-home-page')); 
+                                        updateGreeting('customer-time-greeting', 'customer-name-greeting', res.data.lastName + res.data.title);
+                                        document.getElementById('points-balance').textContent = res.data.points; 
+                                        document.getElementById('voucher-balance').textContent = res.data.vouchers;
+                                        updateMemberLevelUI(res.data.annualPoints); 
+                                        fetchCouponData();
+                                    } else {
+                                        checkLocalLogin();
+                                    }
+                                }).catch((e) => { 
+                                    hideLoader(); 
+                                    checkLocalLogin(); 
+                                    console.error("Fetch API 失敗:", e);
+                                });
+                            }).catch((e) => { 
+                                hideLoader(); 
+                                checkLocalLogin(); 
+                                console.error("LIFF getProfile 失敗:", e);
+                            });
+                        } else {
+                            hideLoader();
+                            checkLocalLogin();
+                        }
+                    }).catch((err) => { 
+                        hideLoader(); 
+                        checkLocalLogin(); 
+                        console.error("LIFF init 失敗:", err);
+                        // 若初始化失敗，顯示在 debug 面板
+                        const dp = document.getElementById('debug-panel');
+                        if (dp) { dp.style.display = 'block'; dp.innerHTML += `<div>LIFF 初始化失敗: ${err.message}</div>`; }
+                    });
+                } else {
+                    hideLoader();
+                    checkLocalLogin();
+                }
+            } catch (fatalError) {
                 hideLoader();
                 checkLocalLogin();
+                const dp = document.getElementById('debug-panel');
+                if (dp) { dp.style.display = 'block'; dp.innerHTML += `<div>重大錯誤: ${fatalError.message}</div>`; }
             }
 
             function checkLocalLogin() {
