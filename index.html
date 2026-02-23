@@ -1,6 +1,6 @@
 <!-- 
     CupiCho Membership Web App
-    Current Version: v26.01.13 (Fix: LIFF ID Pre-filled & Error Catching)
+    Current Version: v26.01.14 (Add LINE Status Indicator)
     Last Updated: 2026/02/23
 -->
 <!DOCTYPE html>
@@ -293,7 +293,9 @@
                     <button class="btn btn-secondary" id="register-button">會員註冊</button>
                 </div>
                 <button id="contact-support-login-btn" class="btn-outline-red">聯繫客服</button>
-                <div class="version-info">v26.01.13</div>
+                <div class="version-info">v26.01.14</div>
+                <!-- ★★★ 新增 LINE 狀態指示器 ★★★ -->
+                <div id="line-auth-status" class="version-info" style="margin-top: 5px; color: #27ae60; font-weight: bold;">LINE 狀態: 檢查中...</div>
             </div>
         </div>
         
@@ -331,7 +333,7 @@
                 </div>
                 
                 <button id="contact-support-btn" class="btn-outline-red">聯繫客服</button>
-                <div class="version-info">v26.01.13</div>
+                <div class="version-info">v26.01.14</div>
             </div> 
         </div>
 
@@ -524,8 +526,8 @@
         };
         
         // Define all functions first (Global Scope)
-        const APP_VERSION = 'v26.01.13';
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwQCy9ej3nsilcx2YI_2XjCLoccmrq7QqiJ0KYN1CMw4CNuLnNaSlY5ELJSebJFnAw/exec";
+        const APP_VERSION = 'v26.01.14';
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxQHRdPr2DgV2cWAsPYP4DDDdlovwBJA_SyV6ojSZSLXU3ExgC2R4eWleJTnP8DE2c/exec;
         const currentYear = new Date().getFullYear();
         
         const CAN_SEND_COUPON_ADMINS = ['10427091']; 
@@ -1280,6 +1282,11 @@
                         if (liff.isLoggedIn() || liff.isInClient()) {
                             liff.getProfile().then(profile => {
                                 currentLineUid = profile.userId;
+                                
+                                // 更新狀態指示器：已授權
+                                const statusEl = document.getElementById('line-auth-status');
+                                if(statusEl) statusEl.textContent = 'LINE 狀態: 已授權 (' + profile.userId.substring(0,5) + '...)';
+
                                 fetch(`${SCRIPT_URL}?action=checkLiff&uid=${currentLineUid}`)
                                 .then(r=>r.json()).then(res => {
                                     hideLoader();
@@ -1304,23 +1311,37 @@
                                 });
                             }).catch((e) => { 
                                 hideLoader(); 
+                                const statusEl = document.getElementById('line-auth-status');
+                                if(statusEl) {
+                                    statusEl.textContent = 'LINE 狀態: 讀取失敗';
+                                    statusEl.style.color = '#c0392b';
+                                }
                                 checkLocalLogin(); 
                                 console.error("LIFF getProfile 失敗:", e);
                             });
                         } else {
                             hideLoader();
+                            const statusEl = document.getElementById('line-auth-status');
+                            if(statusEl) {
+                                statusEl.textContent = 'LINE 狀態: 未登入或外部瀏覽器';
+                                statusEl.style.color = '#888';
+                            }
                             checkLocalLogin();
                         }
                     }).catch((err) => { 
                         hideLoader(); 
                         checkLocalLogin(); 
                         console.error("LIFF init 失敗:", err);
-                        // 若初始化失敗，顯示在 debug 面板
                         const dp = document.getElementById('debug-panel');
                         if (dp) { dp.style.display = 'block'; dp.innerHTML += `<div>LIFF 初始化失敗: ${err.message}</div>`; }
                     });
                 } else {
                     hideLoader();
+                    const statusEl = document.getElementById('line-auth-status');
+                    if(statusEl) {
+                        statusEl.textContent = 'LINE 狀態: 尚未設定 ID';
+                        statusEl.style.color = '#888';
+                    }
                     checkLocalLogin();
                 }
             } catch (fatalError) {
