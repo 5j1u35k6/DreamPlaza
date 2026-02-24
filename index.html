@@ -1,7 +1,7 @@
 <!-- 
     CupiCho Membership Web App
-    Current Version: v26.01.14 (Add LINE Status Indicator)
-    Last Updated: 2026/02/23
+    Current Version: v26.01.16 (Fix: Prevent Auto-Login after Manual Logout)
+    Last Updated: 2026/02/24
 -->
 <!DOCTYPE html>
 <html lang="zh-Hant">
@@ -146,7 +146,7 @@
 
         .admin-actions { display: flex; gap: 15px; }
         
-        /* ★★★ 寄杯卡片樣式 ★★★ */
+        /* 寄杯卡片樣式 */
         .voucher-card {
             background-color: #fff;
             border: 1px solid #e0e0e0;
@@ -164,8 +164,11 @@
         .voucher-count { font-size: 0.9em; color: #666; }
         .voucher-count strong { color: #4a2c2a; font-size: 1.2em; }
         
-        /* ★★★ 點數紀錄樣式 ★★★ */
+        /* 點數紀錄/寄杯歷史 列表樣式 */
         .history-item { display: flex; flex-direction: column; padding: 15px 5px; border-bottom: 1px solid #f0f0f0; text-align: left; }
+        .h-line-1 { font-size: 1.1em; font-weight: bold; color: #333; margin-bottom: 4px; }
+        .h-line-2 { font-size: 0.85em; color: #666; margin-bottom: 2px; }
+        .h-line-3 { font-size: 0.8em; color: #999; }
         .history-title-row { font-size: 1.1em; font-weight: bold; color: #333; margin-bottom: 6px; }
         .history-meta-row { display: flex; justify-content: space-between; align-items: flex-end; }
         .history-date-info { font-size: 0.85em; color: #888; line-height: 1.4; }
@@ -177,9 +180,6 @@
         .history-item.simple-row .title { font-size: 1.1em; font-weight: bold; color: #333; }
         .history-item.simple-row .date { font-size: 0.8em; color: #999; margin-top: 4px; }
         .history-item.simple-row .right { font-size: 1.3em; font-weight: bold; color: #c0392b; }
-        .h-line-1 { font-size: 1.1em; font-weight: bold; color: #333; margin-bottom: 4px; }
-        .h-line-2 { font-size: 0.85em; color: #666; margin-bottom: 2px; }
-        .h-line-3 { font-size: 0.8em; color: #999; }
 
         .btn-redeem { padding: 8px 15px; font-size: 14px; font-weight: bold; background-color: #cb9c65; color: #000; border: none; border-radius: 5px; cursor: pointer; flex-shrink: 0; transition: background 0.2s; }
         .btn-redeem:hover { background-color: #b98b54; }
@@ -244,7 +244,6 @@
         .info-column { flex: 1; background-color: #f9f9f9; border: 1px solid #eee; border-radius: 10px; padding: 15px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; }
         .info-column .btn-action { width: 100%; margin-top: 10px; }
         
-        /* 偵錯模式區塊 (預設隱藏，發生錯誤時顯示) */
         #debug-panel {
             position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(255,0,0,0.9);
             color: white; padding: 10px; font-size: 12px; z-index: 9999;
@@ -253,7 +252,7 @@
     </style>
 </head>
 <body>
-    <div id="debug-panel"></div> <!-- 偵錯顯示區塊 -->
+    <div id="debug-panel"></div> 
     
     <svg style="position: absolute; width: 0; height: 0; overflow: hidden;" version="1.1" xmlns="http://www.w3.org/2000/svg">
       <defs>
@@ -270,32 +269,31 @@
             <div class="news-label">門市優惠快報</div>
             <div class="news-content">
                 <div class="news-list">
-                    <div class="news-item">版本更新！會員電話綁定LINE帳號囉</div>
-                    <div class="news-item">uniopen聯名卡天天享5%折扣，平日再加碼5%</div>
                     <div class="news-item">可可金賞會員享10%回饋！</div>
-                    <div class="news-item">集滿20點以上，成為可可銅賞會員</div>
-                    <div class="news-item">會員專區有問題？請點擊下方聯繫客服</div>
-                    <div class="news-item">版本更新！會員電話綁定LINE帳號囉</div> 
+                    <div class="news-item">uniopen聯名卡天天享5%折扣，平日再加碼5%</div>
+                    <div class="news-item">1/1-1/31推薦朋友加入門市官方帳號，</div>
+                    <div class="news-item">雙方都可以領到美式兌換卷</div>
+                    <div class="news-item">12/26-1/5 BOXING DAY</div>
+                    <div class="news-item">可可金賞會員享10%回饋！</div> 
                 </div>
             </div>
         </div>
 
         <div id="login-page" class="page-section">
             <div class="main-container">
-                <img src="CUPC.png" alt="Cupicho Logo" class="logo">
+                <img src="CUPC.jpg" alt="Cupicho Logo" class="logo">
                 <h1 class="title-main">門市會員專區</h1>
                 <h2 class="title-sub">全球精品巧克力專門店</h2>
                 <h3 class="title-store">DreamPlaza門市</h3>
-                <div class="input-group"><input type="tel" id="login-phone-input" class="form-input" placeholder="請輸入電話號碼"></div>
+                <div class="input-group"><input type="tel" id="login-phone-input" class="form-input" placeholder="請輸入電話號碼或員工編號"></div>
                 <div class="button-group">
-                    <button class="btn btn-primary" id="login-button">會員登入</button>
+                    <button class="btn btn-primary" id="login-button">登入</button>
                     <div class="divider"></div>
                     <button class="btn btn-secondary" id="register-button">會員註冊</button>
                 </div>
                 <button id="contact-support-login-btn" class="btn-outline-red">聯繫客服</button>
-                <div class="version-info">v26.01.14</div>
-                <!-- ★★★ 新增 LINE 狀態指示器 ★★★ -->
-                <div id="line-auth-status" class="version-info" style="margin-top: 5px; color: #27ae60; font-weight: bold;">LINE 狀態: 檢查中...</div>
+                <div class="version-info">v26.01.16</div>
+                <div id="line-auth-status" class="version-info" style="margin-top: 5px; color: #27ae60; font-weight: bold; display: none;"></div>
             </div>
         </div>
         
@@ -333,7 +331,7 @@
                 </div>
                 
                 <button id="contact-support-btn" class="btn-outline-red">聯繫客服</button>
-                <div class="version-info">v26.01.14</div>
+                <div class="version-info">v26.01.16</div>
             </div> 
         </div>
 
@@ -503,30 +501,21 @@
 
         <div id="admin-send-coupon-modal" class="modal-overlay hidden"><div class="modal-content"><span class="close-button" onclick="closeModal(document.getElementById('admin-send-coupon-modal'))">&times;</span><h2 class="modal-title">派發優惠卷</h2><div class="form-grid"><div class="form-group"><label for="send-target-mode">派發對象</label><select id="send-target-mode" class="form-input"><option value="phone">單一會員 (輸入電話)</option><option value="level">會員等級 (批次派發)</option></select></div><div id="target-phone-group" class="form-group"><label for="send-coupon-phone">會員電話</label><input type="tel" id="send-coupon-phone" class="form-input" placeholder="請輸入會員電話"></div><div id="target-level-group" class="form-group hidden"><label for="send-coupon-level">選擇會員等級</label><select id="send-coupon-level" class="form-input"><option value="all">所有會員</option><option value="white">可可白賞</option><option value="bronze">可可銅賞</option><option value="silver">可可銀賞</option><option value="gold">可可金賞</option></select><p style="font-size: 0.8em; color: #c0392b; margin-top: 5px;">注意：批次派發需要處理較多資料，請耐心等待。</p></div><div class="form-group"><label for="send-coupon-type">優惠卷類型</label><select id="send-coupon-type" class="form-input"><option value="">-- 請選擇 --</option><option value="gift_americano">美式咖啡兌換卷</option><option value="gift_bogo">飲品買一送一卷</option><option value="coupon_5">5% 回饋優惠卷</option><option value="coupon_8">8% 回饋優惠卷</option><option value="coupon_10">10% 回饋優惠卷</option><option value="gift_gold">金賞好禮兌換卷</option><option value="other">其他 (自訂名稱)</option></select></div><div id="custom-coupon-name-group" class="form-group hidden"><label for="send-coupon-custom-name">優惠卷名稱</label><input type="text" id="send-coupon-custom-name" class="form-input" placeholder="例如：生日禮、補償卷"></div><div class="form-group"><label for="send-coupon-desc">票卷說明 (選填，將顯示於顧客端)</label><textarea id="send-coupon-desc" class="form-input" rows="3" placeholder="例如：僅限今日使用、需出示身分證..."></textarea></div><div class="form-group"><label for="send-coupon-expiry">有效期限 (選填，預設永久有效)</label><input type="date" id="send-coupon-expiry" class="form-input"></div><div class="form-group"><label for="send-coupon-qty">數量</label><input type="number" id="send-coupon-qty" class="form-input" value="1" min="1" max="10"></div></div><button id="confirm-send-coupon-btn" class="btn btn-primary" style="margin-top:20px;">確認派發</button></div></div>
         
-        <div id="add-voucher-modal" class="modal-overlay hidden"><div class="modal-content"><span class="close-button" onclick="closeModal(this.parentElement.parentElement)">&times;</span><h2 class="modal-title">新增寄杯</h2><div class="form-grid"><div class="form-group"><label for="add-voucher-phone">會員電話號碼</label><input type="tel" id="add-voucher-phone" class="form-input" placeholder="請輸入顧客10碼電話"></div><div class="form-group"><label for="add-voucher-item">寄杯品項</label><select id="add-voucher-item" class="form-input"><option value="">-- 請選擇品項 --</option><optgroup label="咖啡"><option value="咖啡-冰精品美式">冰精品美式</option><option value="咖啡-熱精品美式">熱精品美式</option><option value="咖啡-冰精品拿鐵">冰精品拿鐵</option><option value="咖啡-熱精品拿鐵">熱精品拿鐵</option></optgroup><optgroup label="手沖"><option value="手沖-冰瓜地馬拉">冰瓜地馬拉</option><option value="手沖-熱瓜地馬拉">熱瓜地馬拉</option><option value="手沖-冰哥倫比亞">冰哥倫比亞</option><option value="手沖-熱哥倫比亞">熱哥倫比亞</option><option value="手沖-冰衣索比亞">冰衣索比亞</option><option value="手沖-熱衣索比亞">熱衣索比亞</option></optgroup><optgroup label="純茶"><option value="純茶-冰皇家伯爵紅茶">冰皇家伯爵紅茶</option><option value="純茶-熱皇家伯爵紅茶">熱皇家伯爵紅茶</option><option value="純茶-冰慢焙金烏龍">冰慢焙金烏龍</option><option value="純茶-熱慢焙金烏龍">熱慢焙金烏龍</option></optgroup><optgroup label="風味"><option value="風味-冰特調可可飲">冰特調可可飲</option><option value="風味-熱特調可可飲">熱特調可可飲</option></optgroup></select></div><div class="form-group"><label for="add-voucher-amount">新增數量</label><input type="number" id="add-voucher-amount" class="form-input" placeholder="請輸入杯數" min="1"></div><div class="form-group"><label for="add-voucher-order-id">訂單編號</label><input type="text" id="add-voucher-order-id" class="form-input" placeholder="輸入訂單編號8碼"></div><div class="form-group"><label for="add-voucher-employee-id">員工認證</label><input type="password" id="add-voucher-employee-id" class="form-input" placeholder="請輸入您的員工編號"></div></div><button id="confirm-add-voucher-btn" class="btn btn-primary" style="margin-top:20px;">確認</button></div></div>
+        <div id="add-voucher-modal" class="modal-overlay hidden"><div class="modal-content"><span class="close-button" onclick="closeModal(this.parentElement.parentElement)">&times;</span><h2 class="modal-title">新增寄杯</h2><div class="form-grid"><div class="form-group"><label for="add-voucher-phone">會員電話號碼</label><input type="tel" id="add-voucher-phone" class="form-input" placeholder="請輸入顧客10碼電話"></div><div class="form-group"><label for="add-voucher-item">寄杯品項</label><select id="add-voucher-item" class="form-input"><option value="">-- 請選擇品項 --</option><optgroup label="咖啡"><option value="咖啡-冰精品美式">冰精品美式</option><option value="咖啡-熱精品美式">熱精品美式</option><option value="咖啡-冰精品拿鐵">冰精品拿鐵</option><option value="咖啡-熱精品拿鐵">熱精品拿鐵</option></optgroup><optgroup label="手沖"><option value="手沖-冰瓜地馬拉">冰瓜地馬拉</option><option value="手沖-熱瓜地馬拉">熱瓜地馬拉</option><option value="手沖-冰哥倫比亞">冰哥倫比亞</option><option value="手沖-熱哥倫比亞">熱哥倫比亞</option><option value="手沖-冰衣索比亞">冰衣索比亞</option><option value="手沖-熱衣索比亞">熱衣索比亞</option></optgroup><optgroup label="純茶"><option value="純茶-冰皇家伯爵紅茶">冰皇家伯爵紅茶</option><option value="純茶-熱皇家伯爵紅茶">皇家伯爵紅茶</option><option value="純茶-冰慢焙金烏龍">冰慢焙金烏龍</option><option value="純茶-熱慢焙金烏龍">熱慢焙金烏龍</option></optgroup><optgroup label="風味"><option value="風味-冰特調可可飲">冰特調可可飲</option><option value="風味-熱特調可可飲">熱特調可可飲</option></optgroup></select></div><div class="form-group"><label for="add-voucher-amount">新增數量</label><input type="number" id="add-voucher-amount" class="form-input" placeholder="請輸入杯數" min="1"></div><div class="form-group"><label for="add-voucher-order-id">訂單編號</label><input type="text" id="add-voucher-order-id" class="form-input" placeholder="輸入訂單編號8碼"></div><div class="form-group"><label for="add-voucher-employee-id">員工認證</label><input type="password" id="add-voucher-employee-id" class="form-input" placeholder="請輸入您的員工編號"></div></div><button id="confirm-add-voucher-btn" class="btn btn-primary" style="margin-top:20px;">確認</button></div></div>
         <div id="admin-verify-code-modal" class="modal-overlay hidden"><div class="modal-content"><span class="close-button" onclick="closeModal(this.parentElement.parentElement)">&times;</span><h2 class="modal-title">核銷寄杯</h2><div class="form-group"><label for="admin-redeem-code-input">會員驗證碼</label><input type="number" id="admin-redeem-code-input" class="form-input" placeholder="請輸入會員提供的6位數字"></div><div class="form-group"><label for="admin-redeem-employee-id">員工認證</label><input type="password" id="admin-redeem-employee-id" class="form-input" placeholder="請輸入您的員工編號"></div><button id="verify-redeem-code-btn" class="btn btn-primary" style="margin-top:20px;">驗證</button></div></div>
         <div id="admin-confirm-redeem-modal" class="modal-overlay hidden"><div class="modal-content"><h2 class="modal-title">請確認核銷資訊</h2><div id="admin-confirm-redeem-details" class="confirm-details"></div><div class="confirm-buttons"><button id="cancel-redeem-btn" class="btn btn-secondary">取消</button><button id="final-confirm-redeem-btn" class="btn btn-primary">確認核銷</button></div></div></div>
         <div id="admin-confirm-add-modal" class="modal-overlay hidden"><div class="modal-content"><h2 class="modal-title">請確認新增資訊</h2><div id="admin-confirm-add-details" class="confirm-details"></div><div class="confirm-buttons"><button id="cancel-add-btn" class="btn btn-secondary">取消</button><button id="final-confirm-add-btn" class="btn btn-primary">新增</button></div></div></div>
 
-        <!-- 補回遺失的 QR Code 容器 -->
         <div id="qr-reader-container" class="hidden"><p style="color: white; margin-bottom: 15px;">請掃描集點卡 QR Code</p><div id="qr-reader"></div><button id="close-qr-reader" class="btn btn-secondary" style="margin-top: 20px; width: auto; background-color: #aaa;">關閉掃描</button></div>
 
     </div>
     
     <script>
-        // Global Error Trap
         window.onerror = function(msg, url, line) { 
-            // 如果發生錯誤，顯示在 debug 面板
-            const debugPanel = document.getElementById('debug-panel');
-            if (debugPanel) {
-                debugPanel.style.display = 'block';
-                debugPanel.innerHTML += `<div>[錯誤] ${msg} (行 ${line})</div>`;
-            }
             console.error("系統錯誤:", msg, "Line:", line); 
         };
         
-        // Define all functions first (Global Scope)
-        const APP_VERSION = 'v26.01.14';
+        const APP_VERSION = 'v26.01.16';
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxQHRdPr2DgV2cWAsPYP4DDDdlovwBJA_SyV6ojSZSLXU3ExgC2R4eWleJTnP8DE2c/exec";
         const currentYear = new Date().getFullYear();
         
@@ -543,7 +532,6 @@
             'other': ['此為專屬優惠卷，詳情請洽門市人員。']
         };
 
-        // Global Variables
         const savedPhone = localStorage.getItem('cupicho_user_phone');
         let currentCustomerPhone = null, currentCustomerInfo = {}, searchedPhone = null;
         let verificationCode = null, countdownTimer = null, pollingInterval = null, pendingAddVoucherData = null, pendingPointRedeemItem = null, pendingCouponUseId = null;
@@ -555,7 +543,6 @@
         let currentVoucherTab = 'available';
         let globalVoucherData = { summary: {}, history: [] };
 
-        // ★★★ LIFF ID 設定 ★★★
         const LIFF_ID = "2009202400-cq7s9ItH"; 
         let currentLineUid = null;
 
@@ -662,7 +649,12 @@
             }).catch(err => { hideLoader(); alert('🚫 網路或伺服器錯誤'); }); 
         }
         
-        function logout() { localStorage.removeItem('cupicho_user_phone'); window.location.reload(); }
+        // ★★★ 核心修改：登出時加入跳過自動登入的標記 ★★★
+        function logout() { 
+            localStorage.removeItem('cupicho_user_phone'); 
+            sessionStorage.setItem('skip_auto_login', 'true'); // 加入標記
+            window.location.reload(); 
+        }
 
         function getStarHtml(levelIndex) { if (levelIndex === 0) return ''; const colors = ['', 'grad-bronze', 'grad-silver', 'grad-gold']; const starSvg = `<svg class="star-svg" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="url(#${colors[levelIndex]})" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>`; return new Array(levelIndex).fill(starSvg).join(''); }
         function updateMemberLevelUI(points) {
@@ -1192,9 +1184,14 @@
         function handleFinalConfirmRedeem() { const employeeId = document.getElementById('admin-redeem-employee-id').value; showLoader(); fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'processRedemption', step: 'confirm', code: verificationCode, employeeId }) }).then(r => r.json()).then(result => { hideLoader(); if(result.status === 'success') { alert('核銷成功'); closeModal(document.getElementById('admin-confirm-redeem-modal')); if(searchedPhone) handleAdminLookup(); } else { alert('核銷失敗'); } }).catch(() => { hideLoader(); alert('連線錯誤'); }); }
         function handleAdminSendCoupon() { const phone = document.getElementById('send-coupon-phone').value.trim(); const typeSelect = document.getElementById('send-coupon-type'); let type = typeSelect.value; const qty = parseInt(document.getElementById('send-coupon-qty').value); const targetMode = document.getElementById('send-target-mode').value; const expiryInput = document.getElementById('send-coupon-expiry').value; if (type === 'other') { const customName = document.getElementById('send-coupon-custom-name').value.trim(); if (!customName) { alert('請輸入優惠卷名稱'); return; } type = `other:${customName}`; } let payload = { action: 'sendCoupon', type, qty, employeeId: currentAdminId, targetMode, expiry: expiryInput, desc: document.getElementById('send-coupon-desc').value.trim() }; if (targetMode === 'phone') { if (!phone || !/^\d{10}$/.test(phone)) { alert('請輸入正確電話'); return; } payload.phone = phone; } else { payload.level = document.getElementById('send-coupon-level').value; } if (!type || !qty) { alert('請填寫完整'); return; } if (targetMode === 'level' && !confirm(`確定要派發給「${document.getElementById('send-coupon-level').selectedOptions[0].text}」嗎？`)) return; showLoader(); fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) }).then(r => r.json()).then(res => { hideLoader(); if(res.status === 'success') { alert('✅ 派發成功！'); closeModal(document.getElementById('admin-send-coupon-modal')); } else { alert('⚠️ 派發失敗：' + res.message); } }).catch(() => { hideLoader(); alert('連線錯誤'); }); }
 
-        // ★★★ 事件綁定與 LIFF 初始化 ★★★
         document.addEventListener('DOMContentLoaded', function() {
-            // 先完成所有的按鈕綁定 (這一定要先做)
+            // ★★★ 在初始化的一開始，檢查是否剛按了登出 ★★★
+            const skipAutoLogin = sessionStorage.getItem('skip_auto_login') === 'true';
+            if (skipAutoLogin) {
+                // 如果是，立刻清除標記，這樣下次重新開啟時依然可以自動登入
+                sessionStorage.removeItem('skip_auto_login');
+            }
+
             safeBindListener('member-status-card', 'click', window.showMemberDetailPage);
             safeBindListener('back-to-home-btn', 'click', () => { showPage(document.getElementById('customer-home-page')); });
             safeBindListener('back-from-voucher-history', 'click', goBackToHome);
@@ -1205,10 +1202,13 @@
             safeBindListener('login-button', 'click', handleLogin);
             safeBindListener('register-button', 'click', () => { document.getElementById('reg-phone').value=''; openModal(document.getElementById('register-modal')); });
             safeBindListener('confirm-reg-button', 'click', handleRegister);
+            
+            // ★★★ 顧客與管理員都使用新的 logout 函數 ★★★
             safeBindListener('customer-logout-button', 'click', logout);
+            safeBindListener('admin-logout-button', 'click', logout);
+            
             safeBindListener('add-points-btn', 'click', openQRScanner);
             safeBindListener('redeem-points-btn', 'click', openRedeemPointsPage);
-            
             safeBindListener('points-history-btn', 'click', () => fetchAndShowPointsHistory(currentCustomerPhone));
             safeBindListener('voucher-history-btn', 'click', () => fetchAndShowVoucherHistory(currentCustomerPhone, currentCustomerInfo, 'customer'));
             
@@ -1216,7 +1216,6 @@
             safeBindListener('contact-support-login-btn', 'click', openContactSupportPage); 
             safeBindListener('send-support-btn', 'click', handleSendSupportRequest);
 
-            safeBindListener('admin-logout-button', 'click', logout);
             safeBindListener('lookup-button', 'click', handleAdminLookup);
             safeBindListener('admin-add-voucher-btn', 'click', openAddVoucherModal);
             safeBindListener('admin-redeem-voucher-btn', 'click', () => openModal(document.getElementById('admin-verify-code-modal')));
@@ -1273,31 +1272,25 @@
             const targetModeSelect = document.getElementById('send-target-mode');
             if(targetModeSelect) targetModeSelect.addEventListener('change', (e) => { const ph = document.getElementById('target-phone-group'); const lv = document.getElementById('target-level-group'); if(e.target.value === 'phone') { ph.classList.remove('hidden'); lv.classList.add('hidden'); } else { ph.classList.add('hidden'); lv.classList.remove('hidden'); } });
 
-            // ★★★ LIFF 初始化與登入檢查 (強化除錯狀態顯示) ★★★
             showLoader(); 
-            const statusEl = document.getElementById('line-auth-status');
             
             try {
                 if (LIFF_ID && LIFF_ID !== "YOUR_LIFF_ID_HERE") {
-                    if(statusEl) statusEl.textContent = 'LINE 狀態: 啟動 LIFF SDK...';
-                    
                     liff.init({ liffId: LIFF_ID }).then(() => {
-                        if(statusEl) statusEl.textContent = 'LINE 狀態: LIFF 初始化成功，檢查環境...';
-                        
                         if (liff.isLoggedIn() || liff.isInClient()) {
-                            if(statusEl) statusEl.textContent = 'LINE 狀態: 正在取得使用者資料...';
-                            
                             liff.getProfile().then(profile => {
                                 currentLineUid = profile.userId;
-                                
-                                // 更新狀態指示器：已授權
-                                if(statusEl) statusEl.textContent = 'LINE 狀態: 已授權，連線後端中... (' + profile.userId.substring(0,5) + '...)';
+
+                                // ★★★ 如果剛剛按了登出，立刻阻斷，不讓它自動登入 ★★★
+                                if (skipAutoLogin) {
+                                    hideLoader();
+                                    return; // 停留在登入畫面
+                                }
 
                                 fetch(`${SCRIPT_URL}?action=checkLiff&uid=${currentLineUid}`)
                                 .then(r=>r.json()).then(res => {
                                     hideLoader();
                                     if(res.status === 'success' && res.found) {
-                                        if(statusEl) statusEl.textContent = 'LINE 狀態: 綁定成功，自動登入';
                                         currentAdminId = null;
                                         localStorage.setItem('cupicho_user_phone', res.data.phone); 
                                         currentCustomerPhone = res.data.phone; 
@@ -1309,63 +1302,37 @@
                                         updateMemberLevelUI(res.data.annualPoints); 
                                         fetchCouponData();
                                     } else {
-                                        if(statusEl) statusEl.textContent = 'LINE 狀態: 尚未綁定，請手動登入';
                                         checkLocalLogin();
                                     }
                                 }).catch((e) => { 
                                     hideLoader(); 
-                                    if(statusEl) { statusEl.textContent = 'LINE 狀態: 後端連線失敗'; statusEl.style.color = '#c0392b'; }
                                     checkLocalLogin(); 
-                                    console.error("Fetch API 失敗:", e);
                                 });
                             }).catch((e) => { 
                                 hideLoader(); 
-                                if(statusEl) {
-                                    statusEl.textContent = 'LINE 狀態: 讀取個人資料失敗 (' + e.message + ')';
-                                    statusEl.style.color = '#c0392b';
-                                }
                                 checkLocalLogin(); 
-                                console.error("LIFF getProfile 失敗:", e);
                             });
                         } else {
                             hideLoader();
-                            if(statusEl) {
-                                statusEl.textContent = 'LINE 狀態: 未登入或外部瀏覽器';
-                                statusEl.style.color = '#888';
-                            }
                             checkLocalLogin();
                         }
                     }).catch((err) => { 
                         hideLoader(); 
-                        if(statusEl) { 
-                            statusEl.textContent = 'LINE 狀態: LIFF 錯誤 (' + err.code + ': ' + err.message + ')'; 
-                            statusEl.style.color = '#c0392b'; 
-                        }
                         checkLocalLogin(); 
-                        console.error("LIFF init 失敗:", err);
-                        const dp = document.getElementById('debug-panel');
-                        if (dp) { dp.style.display = 'block'; dp.innerHTML += `<div>LIFF 初始化失敗: ${err.message}</div>`; }
                     });
                 } else {
                     hideLoader();
-                    if(statusEl) {
-                        statusEl.textContent = 'LINE 狀態: 尚未設定 ID';
-                        statusEl.style.color = '#888';
-                    }
                     checkLocalLogin();
                 }
             } catch (fatalError) {
                 hideLoader();
-                if(statusEl) { 
-                    statusEl.textContent = 'LINE 狀態: 嚴重錯誤 (' + fatalError.message + ')'; 
-                    statusEl.style.color = '#c0392b'; 
-                }
                 checkLocalLogin();
-                const dp = document.getElementById('debug-panel');
-                if (dp) { dp.style.display = 'block'; dp.innerHTML += `<div>重大錯誤: ${fatalError.message}</div>`; }
             }
 
             function checkLocalLogin() {
+                // ★★★ 檢查如果剛剛登出過，也不要自動幫他點擊登入按鈕 ★★★
+                if (skipAutoLogin) return; 
+
                 if (savedPhone) { 
                     const inputElement = document.getElementById('login-phone-input'); 
                     const btn = document.getElementById('login-button'); 
