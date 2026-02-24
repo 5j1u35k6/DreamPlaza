@@ -281,11 +281,11 @@
 
         <div id="login-page" class="page-section">
             <div class="main-container">
-                <img src="CUPC.jpg" alt="Cupicho Logo" class="logo">
+                <img src="CUPC.png" alt="Cupicho Logo" class="logo">
                 <h1 class="title-main">門市會員專區</h1>
                 <h2 class="title-sub">全球精品巧克力專門店</h2>
                 <h3 class="title-store">DreamPlaza門市</h3>
-                <div class="input-group"><input type="tel" id="login-phone-input" class="form-input" placeholder="請輸入電話號碼或員工編號"></div>
+                <div class="input-group"><input type="tel" id="login-phone-input" class="form-input" placeholder="請輸入電話號碼"></div>
                 <div class="button-group">
                     <button class="btn btn-primary" id="login-button">登入</button>
                     <div class="divider"></div>
@@ -583,7 +583,7 @@
 
         function handleLogin() {
             const input = document.getElementById('login-phone-input').value.trim();
-            if (!input) { alert('請輸入電話號碼或員工編號'); return; }
+            if (!input) { alert('請輸入電話號碼'); return; }
             
             showLoader(); isCouponsLoaded = false;
             let apiUrl = `${SCRIPT_URL}?action=query&phone=${input}`;
