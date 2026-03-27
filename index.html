@@ -1,6 +1,6 @@
 <!-- 
     CupiCho Membership Web App
-    Current Version: v26.01.16 (Fix: Prevent Auto-Login after Manual Logout)
+    Current Version: v26.01.17 (Feat: Add Order ID input to redeem confirm modal)
     Last Updated: 2026/02/24
 -->
 <!DOCTYPE html>
@@ -269,35 +269,35 @@
             <div class="news-label">門市優惠快報</div>
             <div class="news-content">
                 <div class="news-list">
-                    <div class="news-item">系統更新！電話綁定LINE帳號，秒登入</div>
-                    <div class="news-item">中信X統一聯名卡天天5%折扣，平日再5%</div>
-                    <div class="news-item">累積20點以上，開通可可銅賞權益優惠</div>
                     <div class="news-item">可可金賞會員享10%回饋！</div>
-                    <div class="news-item">會員系統有任何問題請透過下方聯繫客服</div>
-                    <div class="news-item">系統更新！電話綁定LINE帳號，秒登入</div> 
+                    <div class="news-item">uniopen聯名卡天天享5%折扣，平日再加碼5%</div>
+                    <div class="news-item">1/1-1/31推薦朋友加入門市官方帳號，</div>
+                    <div class="news-item">雙方都可以領到美式兌換卷</div>
+                    <div class="news-item">12/26-1/5 BOXING DAY</div>
+                    <div class="news-item">可可金賞會員享10%回饋！</div> 
                 </div>
             </div>
         </div>
 
         <div id="login-page" class="page-section">
             <div class="main-container">
-                <img src="CUPC.png" alt="Cupicho Logo" class="logo">
+                <img src="CUPC.jpg" alt="Cupicho Logo" class="logo">
                 <h1 class="title-main">門市會員專區</h1>
                 <h2 class="title-sub">全球精品巧克力專門店</h2>
                 <h3 class="title-store">DreamPlaza門市</h3>
-                <div class="input-group"><input type="tel" id="login-phone-input" class="form-input" placeholder="請輸入電話號碼"></div>
+                <div class="input-group"><input type="tel" id="login-phone-input" class="form-input" placeholder="請輸入電話號碼或員工編號"></div>
                 <div class="button-group">
                     <button class="btn btn-primary" id="login-button">登入</button>
-                    <div class="divider"></div>
-                    <button class="btn btn-secondary" id="register-button">會員註冊</button>
-                </div>
-                <button id="contact-support-login-btn" class="btn-outline-red">聯繫客服</button>
-                <div class="version-info">v26.01.16</div>
-                <div id="line-auth-status" class="version-info" style="margin-top: 5px; color: #27ae60; font-weight: bold; display: none;"></div>
+                <div class="divider"></div>
+                <button class="btn btn-secondary" id="register-button">會員註冊</button>
             </div>
+            <button id="contact-support-login-btn" class="btn-outline-red">聯繫客服</button>
+            <div class="version-info">v26.01.17</div>
+            <div id="line-auth-status" class="version-info" style="margin-top: 5px; color: #27ae60; font-weight: bold; display: none;"></div>
         </div>
-        
-        <div id="customer-home-page" class="page-section hidden">
+    </div>
+    
+    <div id="customer-home-page" class="page-section hidden">
             <div class="main-container">
                 <div class="header-bar">
                     <div class="greeting-text"><span id="customer-name-greeting"></span> <span id="customer-time-greeting">您好</span></div>
@@ -327,15 +327,15 @@
                     <p class="info-main-data"><span id="voucher-balance">0</span><span class="small-text">杯</span></p>
                     <div class="action-buttons-group">
                         <button class="btn btn-action" id="voucher-history-btn">寄杯查詢</button>
-                    </div>
                 </div>
-                
-                <button id="contact-support-btn" class="btn-outline-red">聯繫客服</button>
-                <div class="version-info">v26.01.16</div>
-            </div> 
-        </div>
+            </div>
+            
+            <button id="contact-support-btn" class="btn-outline-red">聯繫客服</button>
+            <div class="version-info">v26.01.17</div>
+        </div> 
+    </div>
 
-        <div id="member-detail-page" class="page-section hidden">
+    <div id="member-detail-page" class="page-section hidden">
             <div class="main-container">
                 <div class="header-bar">
                     <button id="back-to-home-btn" class="btn-back">返回首頁</button>
@@ -503,7 +503,20 @@
         
         <div id="add-voucher-modal" class="modal-overlay hidden"><div class="modal-content"><span class="close-button" onclick="closeModal(this.parentElement.parentElement)">&times;</span><h2 class="modal-title">新增寄杯</h2><div class="form-grid"><div class="form-group"><label for="add-voucher-phone">會員電話號碼</label><input type="tel" id="add-voucher-phone" class="form-input" placeholder="請輸入顧客10碼電話"></div><div class="form-group"><label for="add-voucher-item">寄杯品項</label><select id="add-voucher-item" class="form-input"><option value="">-- 請選擇品項 --</option><optgroup label="咖啡"><option value="咖啡-冰精品美式">冰精品美式</option><option value="咖啡-熱精品美式">熱精品美式</option><option value="咖啡-冰精品拿鐵">冰精品拿鐵</option><option value="咖啡-熱精品拿鐵">熱精品拿鐵</option></optgroup><optgroup label="手沖"><option value="手沖-冰瓜地馬拉">冰瓜地馬拉</option><option value="手沖-熱瓜地馬拉">熱瓜地馬拉</option><option value="手沖-冰哥倫比亞">冰哥倫比亞</option><option value="手沖-熱哥倫比亞">熱哥倫比亞</option><option value="手沖-冰衣索比亞">冰衣索比亞</option><option value="手沖-熱衣索比亞">熱衣索比亞</option></optgroup><optgroup label="純茶"><option value="純茶-冰皇家伯爵紅茶">冰皇家伯爵紅茶</option><option value="純茶-熱皇家伯爵紅茶">皇家伯爵紅茶</option><option value="純茶-冰慢焙金烏龍">冰慢焙金烏龍</option><option value="純茶-熱慢焙金烏龍">熱慢焙金烏龍</option></optgroup><optgroup label="風味"><option value="風味-冰特調可可飲">冰特調可可飲</option><option value="風味-熱特調可可飲">熱特調可可飲</option></optgroup></select></div><div class="form-group"><label for="add-voucher-amount">新增數量</label><input type="number" id="add-voucher-amount" class="form-input" placeholder="請輸入杯數" min="1"></div><div class="form-group"><label for="add-voucher-order-id">訂單編號</label><input type="text" id="add-voucher-order-id" class="form-input" placeholder="輸入訂單編號8碼"></div><div class="form-group"><label for="add-voucher-employee-id">員工認證</label><input type="password" id="add-voucher-employee-id" class="form-input" placeholder="請輸入您的員工編號"></div></div><button id="confirm-add-voucher-btn" class="btn btn-primary" style="margin-top:20px;">確認</button></div></div>
         <div id="admin-verify-code-modal" class="modal-overlay hidden"><div class="modal-content"><span class="close-button" onclick="closeModal(this.parentElement.parentElement)">&times;</span><h2 class="modal-title">核銷寄杯</h2><div class="form-group"><label for="admin-redeem-code-input">會員驗證碼</label><input type="number" id="admin-redeem-code-input" class="form-input" placeholder="請輸入會員提供的6位數字"></div><div class="form-group"><label for="admin-redeem-employee-id">員工認證</label><input type="password" id="admin-redeem-employee-id" class="form-input" placeholder="請輸入您的員工編號"></div><button id="verify-redeem-code-btn" class="btn btn-primary" style="margin-top:20px;">驗證</button></div></div>
-        <div id="admin-confirm-redeem-modal" class="modal-overlay hidden"><div class="modal-content"><h2 class="modal-title">請確認核銷資訊</h2><div id="admin-confirm-redeem-details" class="confirm-details"></div><div class="confirm-buttons"><button id="cancel-redeem-btn" class="btn btn-secondary">取消</button><button id="final-confirm-redeem-btn" class="btn btn-primary">確認核銷</button></div></div></div>
+        <div id="admin-confirm-redeem-modal" class="modal-overlay hidden">
+            <div class="modal-content">
+                <h2 class="modal-title">請確認核銷資訊</h2>
+                <div id="admin-confirm-redeem-details" class="confirm-details"></div>
+                <div class="confirm-buttons">
+                    <button id="cancel-redeem-btn" class="btn btn-secondary">取消</button>
+                    <button id="final-confirm-redeem-btn" class="btn btn-primary">確認核銷</button>
+                </div>
+            </div>
+        </div>
+        <div id="admin-confirm-add-modal" class="modal-overlay hidden"><div class="modal-content"><h2 class="modal-title">請確認新增資訊</h2>
+                </div>
+            </div>
+        </div>
         <div id="admin-confirm-add-modal" class="modal-overlay hidden"><div class="modal-content"><h2 class="modal-title">請確認新增資訊</h2><div id="admin-confirm-add-details" class="confirm-details"></div><div class="confirm-buttons"><button id="cancel-add-btn" class="btn btn-secondary">取消</button><button id="final-confirm-add-btn" class="btn btn-primary">新增</button></div></div></div>
 
         <div id="qr-reader-container" class="hidden"><p style="color: white; margin-bottom: 15px;">請掃描集點卡 QR Code</p><div id="qr-reader"></div><button id="close-qr-reader" class="btn btn-secondary" style="margin-top: 20px; width: auto; background-color: #aaa;">關閉掃描</button></div>
@@ -516,7 +529,7 @@
         };
         
         const APP_VERSION = 'v26.01.16';
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxQHRdPr2DgV2cWAsPYP4DDDdlovwBJA_SyV6ojSZSLXU3ExgC2R4eWleJTnP8DE2c/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwQCy9ej3nsilcx2YI_2XjCLoccmrq7QqiJ0KYN1CMw4CNuLnNaSlY5ELJSebJFnAw/exec";
         const currentYear = new Date().getFullYear();
         
         const CAN_SEND_COUPON_ADMINS = ['10427091']; 
@@ -583,7 +596,7 @@
 
         function handleLogin() {
             const input = document.getElementById('login-phone-input').value.trim();
-            if (!input) { alert('請輸入電話號碼'); return; }
+            if (!input) { alert('請輸入電話號碼或員工編號'); return; }
             
             showLoader(); isCouponsLoaded = false;
             let apiUrl = `${SCRIPT_URL}?action=query&phone=${input}`;
@@ -1180,7 +1193,7 @@
         function openAddVoucherModal() { const phoneInput = document.getElementById('add-voucher-phone'); if (searchedPhone && searchedPhone.phone) phoneInput.value = searchedPhone.phone; else phoneInput.value = ''; document.getElementById('add-voucher-item').value = ''; document.getElementById('add-voucher-amount').value = ''; document.getElementById('add-voucher-order-id').value = ''; document.getElementById('add-voucher-employee-id').value = ''; openModal(document.getElementById('add-voucher-modal')); }
         function handleConfirmAddVoucher() { const phone = document.getElementById('add-voucher-phone').value.trim(); const item = document.getElementById('add-voucher-item').value; const amount = document.getElementById('add-voucher-amount').value; const orderId = document.getElementById('add-voucher-order-id').value.trim(); const employeeId = document.getElementById('add-voucher-employee-id').value; if (!/^\d{10}$/.test(phone) || !item || !amount || !orderId || !employeeId) { alert('請填寫完整資訊'); return; } pendingAddVoucherData = { action: 'addVoucher', phone, item, amount, orderId, employeeId }; document.getElementById('admin-confirm-add-details').innerHTML = `<p>會員: ${phone}</p><p>品項: ${item}</p><p>數量: ${amount}</p>`; closeModal(document.getElementById('add-voucher-modal')); openModal(document.getElementById('admin-confirm-add-modal')); }
         function handleFinalAddVoucher() { showLoader(); fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(pendingAddVoucherData) }).then(r => r.json()).then(res => { hideLoader(); closeModal(document.getElementById('admin-confirm-add-modal')); if(res.status==='success') { alert('新增成功'); if(searchedPhone && searchedPhone.phone === pendingAddVoucherData.phone) { handleAdminLookup(); } } else alert('新增失敗'); pendingAddVoucherData = null; }).catch(() => { hideLoader(); alert('連線錯誤'); }); }
-        function handleVerifyRedeemCode() { const code = document.getElementById('admin-redeem-code-input').value; const employeeId = document.getElementById('admin-redeem-employee-id').value; if (!code || !employeeId) { alert('請輸入完整資訊'); return; } showLoader(); fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'processRedemption', step: 'verify', code, employeeId }) }).then(r => r.json()).then(result => { hideLoader(); if(result.status === 'success') { const data = result.data; document.getElementById('admin-confirm-redeem-details').innerHTML = `<p>會員: ${data.customerName}</p><p>品項: ${data.item}</p><p>數量: ${data.amount}</p>`; verificationCode = code; closeModal(document.getElementById('admin-verify-code-modal')); openModal(document.getElementById('admin-confirm-redeem-modal')); } else { alert('驗證失敗'); } }).catch(() => { hideLoader(); alert('連線錯誤'); }); }
+        function handleVerifyRedeemCode() { const code = document.getElementById('admin-redeem-code-input').value; const employeeId = document.getElementById('admin-redeem-employee-id').value; if (!code || !employeeId) { alert('請輸入完整資訊'); return; } showLoader(); fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'processRedemption', step: 'verify', code, employeeId }) }).then(r => r.json()).then(result => { hideLoader(); if(result.status === 'success') { const data = result.data; const orderIdDisplay = data.orderId ? data.orderId : '無訂單號碼'; document.getElementById('admin-confirm-redeem-details').innerHTML = `<p>會員: ${data.customerName}</p><p>品項: ${data.item}</p><p>數量: ${data.amount}</p><p>單號: <strong style="color:#6a1d7b;">${orderIdDisplay}</strong></p>`; verificationCode = code; closeModal(document.getElementById('admin-verify-code-modal')); openModal(document.getElementById('admin-confirm-redeem-modal')); } else { alert('驗證失敗'); } }).catch(() => { hideLoader(); alert('連線錯誤'); }); }
         function handleFinalConfirmRedeem() { const employeeId = document.getElementById('admin-redeem-employee-id').value; showLoader(); fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'processRedemption', step: 'confirm', code: verificationCode, employeeId }) }).then(r => r.json()).then(result => { hideLoader(); if(result.status === 'success') { alert('核銷成功'); closeModal(document.getElementById('admin-confirm-redeem-modal')); if(searchedPhone) handleAdminLookup(); } else { alert('核銷失敗'); } }).catch(() => { hideLoader(); alert('連線錯誤'); }); }
         function handleAdminSendCoupon() { const phone = document.getElementById('send-coupon-phone').value.trim(); const typeSelect = document.getElementById('send-coupon-type'); let type = typeSelect.value; const qty = parseInt(document.getElementById('send-coupon-qty').value); const targetMode = document.getElementById('send-target-mode').value; const expiryInput = document.getElementById('send-coupon-expiry').value; if (type === 'other') { const customName = document.getElementById('send-coupon-custom-name').value.trim(); if (!customName) { alert('請輸入優惠卷名稱'); return; } type = `other:${customName}`; } let payload = { action: 'sendCoupon', type, qty, employeeId: currentAdminId, targetMode, expiry: expiryInput, desc: document.getElementById('send-coupon-desc').value.trim() }; if (targetMode === 'phone') { if (!phone || !/^\d{10}$/.test(phone)) { alert('請輸入正確電話'); return; } payload.phone = phone; } else { payload.level = document.getElementById('send-coupon-level').value; } if (!type || !qty) { alert('請填寫完整'); return; } if (targetMode === 'level' && !confirm(`確定要派發給「${document.getElementById('send-coupon-level').selectedOptions[0].text}」嗎？`)) return; showLoader(); fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) }).then(r => r.json()).then(res => { hideLoader(); if(res.status === 'success') { alert('✅ 派發成功！'); closeModal(document.getElementById('admin-send-coupon-modal')); } else { alert('⚠️ 派發失敗：' + res.message); } }).catch(() => { hideLoader(); alert('連線錯誤'); }); }
 
