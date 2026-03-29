@@ -1,6 +1,6 @@
 <!-- 
     CupiCho Membership Web App
-    Current Version: v26.01.17 (Feat: Add Order ID input to redeem confirm modal)
+    Current Version: v26.01.16 (Fix: Prevent Auto-Login after Manual Logout)
     Last Updated: 2026/02/24
 -->
 <!DOCTYPE html>
@@ -16,8 +16,30 @@
     
     <style>
         /* --- 基礎設定 --- */
-        body, html { height: auto; min-height: 100%; margin: 0; font-family: 'Helvetica Neue', 'Segoe UI', 'Microsoft JhengHei', 'PingFang TC', sans-serif; background-color: #f5f2eb; text-align: center; }
+        body, html { height: auto; min-height: 100%; margin: 0; font-family: 'Helvetica Neue', 'Segoe UI', 'Microsoft JhengHei', 'PingFang TC', sans-serif; background-color: #121212; color: #f0f0f0; text-align: center; }
         #root-container { width: 100%; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding-bottom: 0; box-sizing: border-box; }
+
+        
+        /* --- 新增四宮格樣式 --- */
+        .customer-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%; margin-top: 10px; margin-bottom: 20px; }
+        .grid-btn { background-color: #2a2a2a; border: 1px solid #cb9c65; border-radius: 15px; padding: 25px 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        .grid-btn:hover { background-color: #f0f0f0; transform: translateY(-3px); box-shadow: 0 6px 15px rgba(203,156,101,0.3); }
+        .grid-icon { font-size: 2.5em; color: #6a1d7b; text-shadow: 0 0 10px rgba(106, 29, 123, 0.2); }
+        .grid-title { font-size: 1.1em; font-weight: bold; color: #cb9c65; }
+
+        /* 特殊頁面 */
+        .page-content-wrapper { text-align: left; padding: 15px 0; color: #ddd; line-height: 1.6; }
+
+        
+        /* --- 新增四宮格樣式 --- */
+        .customer-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%; margin-top: 10px; margin-bottom: 20px; }
+        .grid-btn { background-color: #2a2a2a; border: 1px solid #cb9c65; border-radius: 15px; padding: 25px 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        .grid-btn:hover { background-color: #333; transform: translateY(-3px); box-shadow: 0 6px 15px rgba(203,156,101,0.3); }
+        .grid-icon { font-size: 2.5em; color: #6a1d7b; text-shadow: 0 0 10px rgba(106, 29, 123, 0.2); }
+        .grid-title { font-size: 1.1em; font-weight: bold; color: #cb9c65; }
+
+        /* 特殊頁面 */
+        .page-content-wrapper { text-align: left; padding: 15px 0; color: #ddd; line-height: 1.6; }
 
         /* --- 頂部公告欄 --- */
         #news-ticker-bar { width: 100%; height: 40px; display: flex; background-color: #cb9c65; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.1); z-index: 1000; position: sticky; top: 0; flex-shrink: 0; }
@@ -37,7 +59,7 @@
 
         /* 頁面容器 */
         .page-section { width: 100%; min-height: calc(100vh - 40px); display: flex; justify-content: center; align-items: flex-start; box-sizing: border-box; padding-top: 30px; padding-bottom: 50px; }
-        .main-container { display: flex; flex-direction: column; background-color: #ffffff; border-radius: 15px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); box-sizing: border-box; position: relative; width: 420px; max-width: 92%; margin: 0 auto; height: auto; min-height: auto; padding: 40px 30px; }
+        .main-container { display: flex; flex-direction: column; background-color: #1a1a1a; color: #f0f0f0; border-radius: 15px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5); border: 1px solid #f0f0f0; box-sizing: border-box; position: relative; width: 420px; max-width: 92%; margin: 0 auto; height: auto; min-height: auto; padding: 40px 30px; }
 
         @media screen and (max-width: 480px) {
             .main-container { width: 95%; padding: 30px 20px; }
@@ -48,22 +70,22 @@
 
         /* 凍結窗格專用樣式 */
         .fixed-layout-container { height: 80vh; display: flex; flex-direction: column; overflow: hidden; padding: 0; }
-        .fixed-header-area { flex-shrink: 0; padding: 20px 20px 10px 20px; background-color: #fff; border-radius: 15px 15px 0 0; z-index: 20; box-shadow: 0 5px 10px rgba(0,0,0,0.02); }
+        .fixed-header-area { flex-shrink: 0; padding: 20px 20px 10px 20px; background-color: #1a1a1a; border-radius: 15px 15px 0 0; z-index: 20; box-shadow: 0 5px 10px rgba(0,0,0,0.02); }
         .scrollable-content { flex: 1; overflow-y: auto; padding: 10px 20px 30px 20px; -webkit-overflow-scrolling: touch; }
 
         /* CSS Helpers */
         .logo { max-width: 180px; margin-bottom: 25px; display: block; margin-left: auto; margin-right: auto; }
-        .title-main { font-size: 2.0em; color: #4a2c2a; margin: 0; font-weight: bold; white-space: nowrap; letter-spacing: -0.5px; }
-        .title-sub { font-size: 1.2em; color: #6d4c41; margin: 10px 0 0 0; }
-        .title-store { font-size: 1em; color: #8d6e63; margin: 5px 0 30px 0; font-weight: normal; }
+        .title-main { font-size: 2.0em; color: #cb9c65; margin: 0; font-weight: bold; white-space: nowrap; letter-spacing: -0.5px; }
+        .title-sub { font-size: 1.2em; color: #cca677; margin: 10px 0 0 0; }
+        .title-store { font-size: 1em; color: #bbbbbb; margin: 5px 0 30px 0; font-weight: normal; }
         .input-group { margin-bottom: 20px; width: 100%; }
-        .form-input { width: 100%; padding: 12px 15px; font-size: 16px; border: 1px solid #d7ccc8; border-radius: 8px; box-sizing: border-box; text-align: center; background-color: #f9f9f9; }
+        .form-input { width: 100%; padding: 12px 15px; font-size: 16px; border: 1px solid #444; border-radius: 8px; box-sizing: border-box; text-align: center; background-color: #2a2a2a; }
         .form-input:disabled, .form-input[readonly] { background-color: #e0e0e0 !important; color: #555 !important; cursor: not-allowed; border-color: #ccc; opacity: 1; -webkit-text-fill-color: #555; }
         .button-group { display: flex; flex-direction: column; gap: 15px; width: 100%; }
         .btn { padding: 15px 20px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: all 0.3s ease; width: 100%; box-sizing: border-box; }
-        .btn-primary { background-color: #000000; color: #cb9c65; }
-        .btn-primary:hover { background-color: #333333; transform: translateY(-2px); }
-        .divider { height: 1px; width: 100%; background-color: #e0e0e0; margin: 20px 0; }
+        .btn-primary { background-color: #111; color: #cb9c65; border: 1px solid #cb9c65; }
+        .btn-primary:hover { background-color: #f0f0f0; transform: translateY(-2px); }
+        .divider { height: 1px; width: 100%; background-color: #444; margin: 20px 0; }
         .btn-secondary { background-color: #cb9c65; color: #000000; border: none; }
         .btn-secondary:hover { background-color: #b98b54; transform: translateY(-2px); }
         .btn-outline-red { background-color: transparent; color: #c0392b; border: 1px solid #c0392b; padding: 12px; font-size: 15px; border-radius: 8px; cursor: pointer; width: 100%; display: block; margin-top: 30px; margin-bottom: 5px; transition: all 0.2s; font-weight: bold; box-sizing: border-box; }
@@ -73,18 +95,18 @@
         /* Modal & Popups */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); justify-content: center; align-items: center; z-index: 2000; }
         .modal-overlay:not(.hidden) { display: flex; }
-        .modal-content { position: relative; padding: 30px; border-radius: 15px; background-color: #ffffff; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); width: 95%; max-width: 600px; box-sizing: border-box; max-height: 90vh; overflow-y: auto; }
-        .modal-title { color: #4a2c2a; margin-top: 0; }
+        .modal-content { position: relative; padding: 30px; border-radius: 15px; background-color: #1a1a1a; color: #f0f0f0; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5); border: 1px solid #f0f0f0; width: 95%; max-width: 600px; box-sizing: border-box; max-height: 90vh; overflow-y: auto; }
+        .modal-title { color: #cb9c65; margin-top: 0; }
         .close-button { position: absolute; top: 15px; right: 20px; font-size: 28px; color: #aaa; cursor: pointer; line-height: 1; z-index: 2001; }
         
         #my-coupons-modal .modal-content { display: flex; flex-direction: column; height: 75vh; min-height: 500px; padding: 0; overflow: hidden; }
-        .coupon-modal-header { flex-shrink: 0; padding: 30px 30px 0 30px; background-color: #fff; z-index: 5; }
+        .coupon-modal-header { flex-shrink: 0; padding: 30px 30px 0 30px; background-color: #1a1a1a; z-index: 5; }
         #coupons-list-container { flex: 1; overflow-y: auto; padding: 10px 30px 30px 30px; -webkit-overflow-scrolling: touch; }
 
         .header-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; width: 100%; }
-        .greeting-text { font-size: 1.5em; color: #4a2c2a; text-align: left; }
+        .greeting-text { font-size: 1.5em; color: #cb9c65; text-align: left; }
         .btn-logout { background: none; border: 1px solid #aaa; color: #888; padding: 8px 15px; font-size: 14px; border-radius: 5px; cursor: pointer; }
-        .btn-back { background: none; border: none; color: #6d4c41; font-size: 1.1em; cursor: pointer; display: flex; align-items: center; font-weight: bold; }
+        .btn-back { background: none; border: none; color: #cca677; font-size: 1.1em; cursor: pointer; display: flex; align-items: center; font-weight: bold; }
         .btn-back::before { content: '‹'; font-size: 1.5em; margin-right: 5px; line-height: 1; }
 
         /* Member Card & Info */
@@ -105,42 +127,43 @@
         .detail-level-name { font-size: 1.8em; font-weight: bold; margin: 10px 0; }
         .detail-progress-wrapper { width: 100%; margin-bottom: 10px; }
         .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 20px 0; }
-        .stats-block { background-color: #f9f9f9; border-radius: 10px; padding: 15px; text-align: center; border: 1px solid #eee; display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100px; }
-        .coupons-block { cursor: pointer; background-color: #fff9f0; border-color: #fae0c5; position: relative; }
+        .stats-block { background-color: #2a2a2a; border-radius: 10px; padding: 15px; text-align: center; border: 1px solid #444; display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100px; }
+        .coupons-block { cursor: pointer; background-color: #222; border: 1px solid #444; position: relative; }
         .coupons-block::after { content: '›'; position: absolute; right: 10px; top: 50%; transform: translateY(-55%); font-size: 24px; color: #dcbfa5; font-weight: bold; }
         .annual-label { font-size: 0.9em; color: #888; }
-        .annual-value { font-size: 2em; font-weight: bold; color: #333; margin: 5px 0; }
-        .annual-unit { font-size: 1em; color: #666; }
+        .annual-value { font-size: 2em; font-weight: bold; color: #f0f0f0; margin: 5px 0; }
+        .annual-unit { font-size: 1em; color: #aaaaaa; }
 
-        .table-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; margin-top: 15px; border-radius: 8px; border: 1px solid #eee; }
+        .table-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; margin-top: 15px; border-radius: 8px; border: 1px solid #444; }
         .benefit-table { width: 100%; border-collapse: collapse; font-size: 0.9em; min-width: 500px; }
-        .benefit-table th { background-color: #4a2c2a; color: #fff; padding: 10px; }
-        .benefit-table td { padding: 10px; text-align: center; border-bottom: 1px solid #eee; border-right: 1px solid #eee; }
-        .benefit-table tr:nth-child(even) { background-color: #fafafa; }
+        .benefit-table th { background-color: #cb9c65; color: #fff; padding: 10px; }
+        .benefit-table td { padding: 10px; text-align: center; border-bottom: 1px solid #444; border-right: 1px solid #444; color: #f0f0f0; }
+        .benefit-table tr:nth-child(even) { background-color: #2a2a2a; }
+        .benefit-table tr:nth-child(even) td { color: #f0f0f0; }
         .member-notice-small { font-size: 0.75em; color: #888; text-align: left; margin: 10px 5px 15px 5px; line-height: 1.5; }
 
-        .info-card { position: relative; display: flex; flex-direction: column; background-color: #fdfdfd; border: 1px solid #f0e9e9; border-radius: 12px; padding: 25px; text-align: center; margin-bottom: 20px; width: 100%; box-sizing: border-box; min-height: 180px; }
-        .info-title { font-size: 1em; font-weight: 600; color: #8d6e63; margin-top: 0; margin-bottom: 15px; }
-        .info-main-data { font-size: 3.2em; color: #333; font-weight: bold; margin: 0; line-height: 1.2; display: flex; justify-content: center; align-items: baseline; gap: 8px; }
+        .info-card { position: relative; display: flex; flex-direction: column; background-color: #222; border: 1px solid #444; box-shadow: 0 4px 8px rgba(0,0,0,0.5); border-radius: 12px; padding: 25px; text-align: center; margin-bottom: 20px; width: 100%; box-sizing: border-box; min-height: 180px; }
+        .info-title { font-size: 1em; font-weight: 600; color: #bbbbbb; margin-top: 0; margin-bottom: 15px; }
+        .info-main-data { font-size: 3.2em; color: #f0f0f0; font-weight: bold; margin: 0; line-height: 1.2; display: flex; justify-content: center; align-items: baseline; gap: 8px; }
         .small-text { font-size: 14px; font-weight: normal; color: #999; }
         .action-buttons-group { display: flex; flex-direction: row; gap: 10px; margin-top: auto; }
-        .btn-action { background-color: #fff; color: #6d4c41; border: 1px solid #d7ccc8; flex: 1; padding: 12px 5px; font-size: 15px; }
-        .btn-action:hover { background-color: #f5f2eb; transform: translateY(-2px); }
+        .btn-action { background-color: #1a1a1a; color: #cca677; border: 1px solid #444; flex: 1; padding: 12px 5px; font-size: 15px; }
+        .btn-action:hover { background-color: #121212; color: #f0f0f0; transform: translateY(-2px); }
 
         /* Colors & Styles */
-        .lv0-style { background: linear-gradient(135deg, #FFFFFF 0%, #F5F5F5 50%, #FFFFFF 100%); color: #4a2c2a; }
-        .lv0-style .progress-fill { background-color: #9E9E9E; }
+        .lv0-style { background: linear-gradient(135deg, #FFFFFF 0%, #F5F5F5 50%, #FFFFFF 100%); color: #111111; }
+        .lv0-style .progress-fill { background-color: #777777; }
         .lv1-style { background: linear-gradient(135deg, #CD7F32 0%, #E8A87C 50%, #CD7F32 100%); color: #FFFFFF; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
         .lv1-style .progress-track { background-color: rgba(255,255,255,0.3); }
         .lv1-style .progress-fill { background-color: #CD7F32; }
-        .lv2-style { background: linear-gradient(135deg, #E0E0E0 0%, #F5F5F5 40%, #C0C0C0 100%); color: #333333; }
-        .lv2-style .progress-fill { background-color: #7F7F7F; }
-        .lv3-style { background: linear-gradient(135deg, #FFD700 0%, #FFFACD 40%, #DAA520 100%); color: #4a2c2a; }
+        .lv2-style { background: linear-gradient(135deg, #E0E0E0 0%, #F5F5F5 40%, #C0C0C0 100%); color: #111111; }
+        .lv2-style .progress-fill { background-color: #555555; }
+        .lv3-style { background: linear-gradient(135deg, #FFD700 0%, #FFFACD 40%, #DAA520 100%); color: #cb9c65; }
         .lv3-style .progress-fill { background-color: #B8860B; }
-        .text-lv0 { color: #9E9E9E; } .text-lv1 { color: #CD7F32; } .text-lv2 { color: #7F7F7F; } .text-lv3 { color: #B8860B; } 
+        .text-lv0 { color: #555555; } .text-lv1 { color: #FFFFFF; } .text-lv2 { color: #111111; } .text-lv3 { color: #B8860B; } 
 
         .form-grid { display: grid; gap: 15px; text-align: left; }
-        .form-group label { display: block; margin-bottom: 5px; font-size: 0.9em; color: #666; }
+        .form-group label { display: block; margin-bottom: 5px; font-size: 0.9em; color: #aaaaaa; }
         .form-group .form-input { text-align: left; }
         #admin-send-coupon-modal .form-grid { gap: 25px; }
 
@@ -148,8 +171,8 @@
         
         /* 寄杯卡片樣式 */
         .voucher-card {
-            background-color: #fff;
-            border: 1px solid #e0e0e0;
+            background-color: #1a1a1a;
+            border: 1px solid #444;
             border-radius: 12px;
             padding: 20px;
             margin-bottom: 15px;
@@ -159,17 +182,17 @@
             box-shadow: 0 3px 6px rgba(0,0,0,0.05);
         }
         .voucher-info { text-align: left; display: flex; align-items: center; gap: 15px; }
-        .voucher-icon { width: 50px; height: 50px; background-color: #f5f2eb; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; color: #6a1d7b; }
-        .voucher-name { font-size: 1.1em; font-weight: bold; color: #333; margin-bottom: 4px; display: block; }
-        .voucher-count { font-size: 0.9em; color: #666; }
-        .voucher-count strong { color: #4a2c2a; font-size: 1.2em; }
+        .voucher-icon { width: 50px; height: 50px; background-color: #121212; color: #f0f0f0; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; color: #6a1d7b; }
+        .voucher-name { font-size: 1.1em; font-weight: bold; color: #f0f0f0; margin-bottom: 4px; display: block; }
+        .voucher-count { font-size: 0.9em; color: #aaaaaa; }
+        .voucher-count strong { color: #cb9c65; font-size: 1.2em; }
         
         /* 點數紀錄/寄杯歷史 列表樣式 */
         .history-item { display: flex; flex-direction: column; padding: 15px 5px; border-bottom: 1px solid #f0f0f0; text-align: left; }
-        .h-line-1 { font-size: 1.1em; font-weight: bold; color: #333; margin-bottom: 4px; }
-        .h-line-2 { font-size: 0.85em; color: #666; margin-bottom: 2px; }
+        .h-line-1 { font-size: 1.1em; font-weight: bold; color: #f0f0f0; margin-bottom: 4px; }
+        .h-line-2 { font-size: 0.85em; color: #aaaaaa; margin-bottom: 2px; }
         .h-line-3 { font-size: 0.8em; color: #999; }
-        .history-title-row { font-size: 1.1em; font-weight: bold; color: #333; margin-bottom: 6px; }
+        .history-title-row { font-size: 1.1em; font-weight: bold; color: #f0f0f0; margin-bottom: 6px; }
         .history-meta-row { display: flex; justify-content: space-between; align-items: flex-end; }
         .history-date-info { font-size: 0.85em; color: #888; line-height: 1.4; }
         .history-val-display { font-size: 1.3em; font-weight: bold; }
@@ -177,46 +200,46 @@
         .val-minus { color: #c0392b; }
         .history-item.simple-row { flex-direction: row; justify-content: space-between; align-items: center; }
         .history-item.simple-row .left { display: flex; flex-direction: column; }
-        .history-item.simple-row .title { font-size: 1.1em; font-weight: bold; color: #333; }
+        .history-item.simple-row .title { font-size: 1.1em; font-weight: bold; color: #f0f0f0; }
         .history-item.simple-row .date { font-size: 0.8em; color: #999; margin-top: 4px; }
         .history-item.simple-row .right { font-size: 1.3em; font-weight: bold; color: #c0392b; }
 
         .btn-redeem { padding: 8px 15px; font-size: 14px; font-weight: bold; background-color: #cb9c65; color: #000; border: none; border-radius: 5px; cursor: pointer; flex-shrink: 0; transition: background 0.2s; }
         .btn-redeem:hover { background-color: #b98b54; }
 
-        .product-item { display: flex; align-items: center; margin-bottom: 15px; border: 1px solid #e0e0e0; border-radius: 12px; overflow: hidden; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
-        .product-img-container { width: 120px; height: 120px; background-color: #fff5e6; display: flex; align-items: center; justify-content: center; border-right: 1px dashed #e0e0e0; flex-shrink: 0; }
+        .product-item { display: flex; align-items: center; margin-bottom: 15px; border: 1px solid #444; border-radius: 12px; overflow: hidden; background: #1a1a1a; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
+        .product-img-container { width: 120px; height: 120px; background-color: #fff5e6; display: flex; align-items: center; justify-content: center; border-right: 1px dashed #444; flex-shrink: 0; }
         .product-img { width: 90%; height: 90%; object-fit: contain; }
         .product-details { flex: 1; text-align: left; padding: 0 15px; display: flex; flex-direction: column; justify-content: center; }
-        .product-name { font-size: 1.1em; font-weight: bold; color: #333; margin-bottom: 5px; line-height: 1.2; }
+        .product-name { font-size: 1.1em; font-weight: bold; color: #f0f0f0; margin-bottom: 5px; line-height: 1.2; }
         .product-cost-row { display: flex; align-items: baseline; }
         .product-cost-num { font-size: 1.5em; font-weight: bold; color: #6a1d7b; margin-right: 3px; }
         .product-cost-text { font-size: 0.9em; font-weight: bold; color: #cb9c65; }
         .product-action { padding-right: 15px; }
         .btn-redeem-product { padding: 8px 15px; font-size: 0.9em; background-color: #cb9c65; color: #fff; border: none; border-radius: 5px; cursor: pointer; white-space: nowrap; }
-        .btn-redeem-product:disabled { background-color: #e0e0e0; color: #999; cursor: not-allowed; }
+        .btn-redeem-product:disabled { background-color: #444; color: #999; cursor: not-allowed; }
 
-        .coupon-item { display: flex; align-items: center; margin-bottom: 15px; border: 1px solid #e0e0e0; border-radius: 12px; overflow: hidden; }
+        .coupon-item { display: flex; align-items: center; margin-bottom: 15px; border: 1px solid #444; border-radius: 12px; overflow: hidden; }
         .coupon-img-container { width: 120px; height: 120px; background-color: #fff5e6; display: flex; align-items: center; justify-content: center; }
         .coupon-img { width: 95%; height: 95%; object-fit: contain; }
         .coupon-details { flex: 1; text-align: left; padding: 15px; }
-        .coupon-name { font-size: 1.1em; font-weight: bold; color: #333; display: block; margin-bottom: 4px; }
-        .coupon-desc { font-size: 0.9em; color: #666; }
+        .coupon-name { font-size: 1.1em; font-weight: bold; color: #f0f0f0; display: block; margin-bottom: 4px; }
+        .coupon-desc { font-size: 0.9em; color: #aaaaaa; }
         .coupon-action { padding-right: 15px; }
         .btn-use-coupon { background-color: #cb9c65; color: #000; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-size: 0.9em; font-weight: bold; }
         .btn-use-coupon:disabled { background-color: #ccc; cursor: default; color: #fff; }
 
-        .tabs-header { display: flex; border-bottom: 2px solid #e0e0e0; margin-bottom: 15px; }
+        .tabs-header { display: flex; border-bottom: 2px solid #444; margin-bottom: 15px; }
         .tab-btn { flex: 1; padding: 10px; border: none; background: none; font-size: 16px; color: #888; border-bottom: 3px solid transparent; }
-        .tab-btn.active { color: #4a2c2a; border-bottom-color: #4a2c2a; font-weight: bold; }
+        .tab-btn.active { color: #cb9c65; border-bottom-color: #cb9c65; font-weight: bold; }
         
-        .points-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
-        .points-current { font-size: 1.2em; color: #333; font-weight: bold; }
+        .points-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 10px; border-bottom: 1px solid #444; padding-bottom: 10px; }
+        .points-current { font-size: 1.2em; color: #f0f0f0; font-weight: bold; }
         .points-expiring { font-size: 0.9em; color: #c0392b; }
         .points-disclaimer { font-size: 0.7em; color: #999; margin-bottom: 15px; text-align: left; line-height: 1.5; }
         .version-info { margin-top: 20px; margin-bottom: 10px; font-size: 0.75em; color: #ccc; text-align: center; width: 100%; }
 
-        .coupon-confirm-img { height: 120px; width: auto; max-width: 100%; object-fit: contain; margin-bottom: 15px; display: block; margin-left: auto; margin-right: auto; border-radius: 8px; border: 1px solid #eee; }
+        .coupon-confirm-img { height: 120px; width: auto; max-width: 100%; object-fit: contain; margin-bottom: 15px; display: block; margin-left: auto; margin-right: auto; border-radius: 8px; border: 1px solid #444; }
         .coupon-confirm-content { text-align: left; margin-bottom: 20px; font-size: 0.9em; line-height: 1.5; color: #555; }
         .coupon-confirm-content p { margin: 8px 0; }
         .coupon-confirm-content ul { padding-left: 20px; margin: 0; }
@@ -241,7 +264,7 @@
         .lookup-form .form-input { flex: 1; margin-bottom: 0; }
         .lookup-form .btn { width: auto; padding: 12px 20px; flex-shrink: 0; }
         .info-box { display: flex; gap: 15px; margin-top: 15px; }
-        .info-column { flex: 1; background-color: #f9f9f9; border: 1px solid #eee; border-radius: 10px; padding: 15px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; }
+        .info-column { flex: 1; background-color: #2a2a2a; border: 1px solid #444; border-radius: 10px; padding: 15px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; }
         .info-column .btn-action { width: 100%; margin-top: 10px; }
         
         #debug-panel {
@@ -285,19 +308,19 @@
                 <h1 class="title-main">門市會員專區</h1>
                 <h2 class="title-sub">全球精品巧克力專門店</h2>
                 <h3 class="title-store">DreamPlaza門市</h3>
-                <div class="input-group"><input type="tel" id="login-phone-input" class="form-input" placeholder="請輸入電話號碼或員工編號"></div>
+                <div class="input-group"><input type="tel" id="login-phone-input" class="form-input" placeholder="請輸入電話號碼"></div>
                 <div class="button-group">
                     <button class="btn btn-primary" id="login-button">登入</button>
-                <div class="divider"></div>
-                <button class="btn btn-secondary" id="register-button">會員註冊</button>
+                    <div class="divider"></div>
+                    <button class="btn btn-secondary" id="register-button">會員註冊</button>
+                </div>
+                <button id="contact-support-login-btn" class="btn-outline-red">聯繫客服</button>
+                <div class="version-info">v26.01.16</div>
+                <div id="line-auth-status" class="version-info" style="margin-top: 5px; color: #27ae60; font-weight: bold; display: none;"></div>
             </div>
-            <button id="contact-support-login-btn" class="btn-outline-red">聯繫客服</button>
-            <div class="version-info">v26.01.17</div>
-            <div id="line-auth-status" class="version-info" style="margin-top: 5px; color: #27ae60; font-weight: bold; display: none;"></div>
         </div>
-    </div>
-    
-    <div id="customer-home-page" class="page-section hidden">
+        
+        <div id="customer-home-page" class="page-section hidden">
             <div class="main-container">
                 <div class="header-bar">
                     <div class="greeting-text"><span id="customer-name-greeting"></span> <span id="customer-time-greeting">您好</span></div>
@@ -313,29 +336,108 @@
                     <div class="member-card-bottom"><div class="next-level-text text-lv1" id="next-level-name">可可銅賞</div></div>
                     <div style="font-size: 0.8em; text-align: center; margin-top: 5px; opacity: 0.7;">(點擊查看會員權益詳情)</div>
                 </div>
+                <div class="customer-grid">
+                    <div class="grid-btn" id="grid-points-btn">
+                        <div class="grid-icon"><svg width="45" height="45" viewBox="0 0 24 24" fill="none" stroke="#cb9c65" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg></div>
+                        <div class="grid-title">集點</div>
+                    </div>
+                    <div class="grid-btn" id="grid-vouchers-btn">
+                        <div class="grid-icon"><svg width="45" height="45" viewBox="0 0 24 24" fill="none" stroke="#cb9c65" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path><line x1="6" y1="1" x2="6" y2="4"></line><line x1="10" y1="1" x2="10" y2="4"></line><line x1="14" y1="1" x2="14" y2="4"></line></svg></div>
+                        <div class="grid-title">寄杯</div>
+                    </div>
+                    <div class="grid-btn" id="grid-events-btn">
+                        <div class="grid-icon"><svg width="45" height="45" viewBox="0 0 24 24" fill="none" stroke="#cb9c65" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));"><rect x="3" y="8" width="18" height="14" rx="2" ry="2"></rect><line x1="12" y1="8" x2="12" y2="22"></line><path d="M19 8c-1.5 0-3-2-3-3s1.5-3 3-3 3 2 3 3-1.5 3-3 3z"></path><path d="M5 8c1.5 0 3-2 3-3s-1.5-3-3-3-3 2-3 3 1.5 3 3 3z"></path></svg></div>
+                        <div class="grid-title">特別活動</div>
+                    </div>
+                    <div class="grid-btn" id="grid-contact-btn">
+                        <div class="grid-icon"><svg width="45" height="45" viewBox="0 0 24 24" fill="none" stroke="#cb9c65" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg></div>
+                        <div class="grid-title">聯繫我們</div>
+                    </div>
+                </div>
+                <span id="points-balance" style="display:none;">0</span>
+                <span id="voucher-balance" style="display:none;">0</span>
+                <button id="contact-support-btn" class="btn-outline-red" style="display:none;">聯繫客服</button>
+                <div class="version-info">v26.01.16</div>
+            </div> 
+        </div>
+
+        
+        <div id="customer-points-page" class="page-section hidden">
+            <div class="main-container">
+                <div class="header-bar"><button class="btn-back" id="back-from-points-page">返回</button><h2 class="title-sub" style="margin:0;">集點中心</h2><div style="width:30px;"></div></div><div class="divider"></div>
                 <div class="info-card"> 
                     <h3 class="info-title">目前點數</h3>
-                    <p class="info-main-data"><span id="points-balance">0</span><span class="small-text">點</span></p>
+                    <p class="info-main-data"><span id="points-page-balance">0</span><span class="small-text">點</span></p>
                     <div class="action-buttons-group">
                         <button class="btn btn-action" id="add-points-btn">新增點數</button> 
                         <button class="btn btn-action" id="redeem-points-btn">點數兌換</button>
                         <button class="btn btn-action" id="points-history-btn">點數紀錄</button>
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <div id="customer-vouchers-page" class="page-section hidden">
+            <div class="main-container">
+                <div class="header-bar"><button class="btn-back" id="back-from-vouchers-page">返回</button><h2 class="title-sub" style="margin:0;">我的寄杯</h2><div style="width:30px;"></div></div><div class="divider"></div>
                 <div class="info-card"> 
                     <h3 class="info-title">寄杯數量</h3>
-                    <p class="info-main-data"><span id="voucher-balance">0</span><span class="small-text">杯</span></p>
+                    <p class="info-main-data"><span id="vouchers-page-balance">0</span><span class="small-text">杯</span></p>
                     <div class="action-buttons-group">
-                        <button class="btn btn-action" id="voucher-history-btn">寄杯查詢</button>
+                        <button class="btn btn-action" id="voucher-history-btn">寄杯查詢與核銷</button>
+                    </div>
                 </div>
             </div>
-            
-            <button id="contact-support-btn" class="btn-outline-red">聯繫客服</button>
-            <div class="version-info">v26.01.17</div>
-        </div> 
-    </div>
+        </div>
 
-    <div id="member-detail-page" class="page-section hidden">
+        <div id="special-events-page" class="page-section hidden">
+            <div class="main-container">
+                <div class="header-bar"><button class="btn-back" id="back-from-events-page">返回</button><h2 class="title-sub" style="margin:0;">特別活動</h2><div style="width:30px;"></div></div><div class="divider"></div>
+                <div class="page-content-wrapper">
+                    <p style="text-align:center; color:#999; margin-top:60px; font-size:1.1em;">目前尚無舉行中的特別活動，敬請期待！</p>
+                </div>
+            </div>
+        </div>
+
+        
+        <div id="customer-points-page" class="page-section hidden">
+            <div class="main-container">
+                <div class="header-bar"><button class="btn-back" id="back-from-points-page">返回</button><h2 class="title-sub" style="margin:0;">集點中心</h2><div style="width:30px;"></div></div><div class="divider"></div>
+                <div class="info-card"> 
+                    <h3 class="info-title">目前點數</h3>
+                    <p class="info-main-data"><span id="points-page-balance">0</span><span class="small-text">點</span></p>
+                    <div class="action-buttons-group">
+                        <button class="btn btn-action" id="add-points-btn">新增點數</button> 
+                        <button class="btn btn-action" id="redeem-points-btn">點數兌換</button>
+                        <button class="btn btn-action" id="points-history-btn">點數紀錄</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="customer-vouchers-page" class="page-section hidden">
+            <div class="main-container">
+                <div class="header-bar"><button class="btn-back" id="back-from-vouchers-page">返回</button><h2 class="title-sub" style="margin:0;">我的寄杯</h2><div style="width:30px;"></div></div><div class="divider"></div>
+                <div class="info-card"> 
+                    <h3 class="info-title">寄杯數量</h3>
+                    <p class="info-main-data"><span id="vouchers-page-balance">0</span><span class="small-text">杯</span></p>
+                    <div class="action-buttons-group">
+                        <button class="btn btn-action" id="voucher-history-btn">寄杯查詢與核銷</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="special-events-page" class="page-section hidden">
+            <div class="main-container">
+                <div class="header-bar"><button class="btn-back" id="back-from-events-page">返回</button><h2 class="title-sub" style="margin:0;">特別活動</h2><div style="width:30px;"></div></div><div class="divider"></div>
+                <div class="page-content-wrapper">
+                    <p style="text-align:center; color:#999; margin-top:60px; font-size:1.1em;">目前尚無舉行中的特別活動，敬請期待！</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="member-detail-page" class="page-section hidden">
             <div class="main-container">
                 <div class="header-bar">
                     <button id="back-to-home-btn" class="btn-back">返回首頁</button>
@@ -385,7 +487,7 @@
                     <button id="admin-redeem-voucher-btn" class="btn btn-secondary">核銷寄杯</button>
                 </div>
                 <div class="admin-actions" style="margin-top: 15px;">
-                    <button id="admin-send-coupon-btn" class="btn btn-primary" style="background-color: #4a2c2a; color: #fff;">派發優惠卷</button>
+                    <button id="admin-send-coupon-btn" class="btn btn-primary" style="background-color: #cb9c65; color: #fff;">派發優惠卷</button>
                 </div>
                 <div class="divider"></div>
                 <div class="lookup-section"><h3 class="section-title">會員資料查詢</h3><div class="lookup-form"><input type="tel" id="lookup-phone-input" class="form-input" placeholder="請輸入會員10碼電話號碼"><button id="lookup-button" class="btn btn-primary">查詢</button></div></div>
@@ -394,7 +496,7 @@
                     <h3 class="section-title">查詢結果</h3>
                     <div style="text-align: left; margin-bottom: 15px; padding-left: 5px;">
                         <div style="margin-bottom: 4px; font-size: 1.1em;">會員：<strong id="result-name-display"></strong></div>
-                        <div style="margin-bottom: 4px; font-size: 1.1em;">等級：<strong id="result-level-display" style="color: #8d6e63;"></strong></div>
+                        <div style="margin-bottom: 4px; font-size: 1.1em;">等級：<strong id="result-level-display" style="color: #bbbbbb;"></strong></div>
                     </div>
                     <div class="info-box">
                         <div class="info-column"><h3 class="info-title">目前點數</h3><p class="info-main-data"><span id="result-points">0</span> <span class="small-text">點</span></p><button id="admin-points-history-btn" class="btn btn-action" style="width: auto; padding: 8px 15px; margin-top: 10px;">點數紀錄</button></div>
@@ -459,7 +561,7 @@
         </div>
 
         <div id="loading-modal" class="modal-overlay hidden">
-            <div class="loading-box"><div class="loading-spinner"></div><p class="loading-text">處理中...</p></div>
+            <div class="loading-box"><div class="loading-spinner" style="border-top-color:#cb9c65;"></div><p class="loading-text" style="color:#cb9c65;">資料處理中，請稍候...</p></div>
         </div>
 
         <div id="my-coupons-modal" class="modal-overlay hidden">
@@ -483,9 +585,9 @@
                 <span class="close-button" onclick="closeModal(this.parentElement.parentElement)">&times;</span>
                 <h2 class="modal-title">請出示給店員核銷</h2>
                 <div style="text-align: center; margin: 30px 0;">
-                    <div id="verification-code-display" style="font-size: 3.5em; font-weight: bold; color: #4a2c2a; letter-spacing: 5px; font-family: monospace;"></div>
+                    <div id="verification-code-display" style="font-size: 3.5em; font-weight: bold; color: #cb9c65; letter-spacing: 5px; font-family: monospace;"></div>
                     <p style="color: #c0392b; font-size: 0.9em; margin-top: 15px;">有效時間倒數 <span id="countdown-timer">03:00</span></p>
-                    <button class="btn btn-secondary" style="margin-top: 20px; background-color: #eee; color: #555;" onclick="closeModal(this.parentElement.parentElement)">關閉視窗</button>
+                    <button class="btn btn-secondary" style="margin-top: 20px; background-color: #444; color: #555;" onclick="closeModal(this.parentElement.parentElement)">關閉視窗</button>
                 </div>
             </div>
         </div>
@@ -501,23 +603,16 @@
 
         <div id="admin-send-coupon-modal" class="modal-overlay hidden"><div class="modal-content"><span class="close-button" onclick="closeModal(document.getElementById('admin-send-coupon-modal'))">&times;</span><h2 class="modal-title">派發優惠卷</h2><div class="form-grid"><div class="form-group"><label for="send-target-mode">派發對象</label><select id="send-target-mode" class="form-input"><option value="phone">單一會員 (輸入電話)</option><option value="level">會員等級 (批次派發)</option></select></div><div id="target-phone-group" class="form-group"><label for="send-coupon-phone">會員電話</label><input type="tel" id="send-coupon-phone" class="form-input" placeholder="請輸入會員電話"></div><div id="target-level-group" class="form-group hidden"><label for="send-coupon-level">選擇會員等級</label><select id="send-coupon-level" class="form-input"><option value="all">所有會員</option><option value="white">可可白賞</option><option value="bronze">可可銅賞</option><option value="silver">可可銀賞</option><option value="gold">可可金賞</option></select><p style="font-size: 0.8em; color: #c0392b; margin-top: 5px;">注意：批次派發需要處理較多資料，請耐心等待。</p></div><div class="form-group"><label for="send-coupon-type">優惠卷類型</label><select id="send-coupon-type" class="form-input"><option value="">-- 請選擇 --</option><option value="gift_americano">美式咖啡兌換卷</option><option value="gift_bogo">飲品買一送一卷</option><option value="coupon_5">5% 回饋優惠卷</option><option value="coupon_8">8% 回饋優惠卷</option><option value="coupon_10">10% 回饋優惠卷</option><option value="gift_gold">金賞好禮兌換卷</option><option value="other">其他 (自訂名稱)</option></select></div><div id="custom-coupon-name-group" class="form-group hidden"><label for="send-coupon-custom-name">優惠卷名稱</label><input type="text" id="send-coupon-custom-name" class="form-input" placeholder="例如：生日禮、補償卷"></div><div class="form-group"><label for="send-coupon-desc">票卷說明 (選填，將顯示於顧客端)</label><textarea id="send-coupon-desc" class="form-input" rows="3" placeholder="例如：僅限今日使用、需出示身分證..."></textarea></div><div class="form-group"><label for="send-coupon-expiry">有效期限 (選填，預設永久有效)</label><input type="date" id="send-coupon-expiry" class="form-input"></div><div class="form-group"><label for="send-coupon-qty">數量</label><input type="number" id="send-coupon-qty" class="form-input" value="1" min="1" max="10"></div></div><button id="confirm-send-coupon-btn" class="btn btn-primary" style="margin-top:20px;">確認派發</button></div></div>
         
-        <div id="add-voucher-modal" class="modal-overlay hidden"><div class="modal-content"><span class="close-button" onclick="closeModal(this.parentElement.parentElement)">&times;</span><h2 class="modal-title">新增寄杯</h2><div class="form-grid"><div class="form-group"><label for="add-voucher-phone">會員電話號碼</label><input type="tel" id="add-voucher-phone" class="form-input" placeholder="請輸入顧客10碼電話"></div><div class="form-group"><label for="add-voucher-item">寄杯品項</label><select id="add-voucher-item" class="form-input"><option value="">-- 請選擇品項 --</option><optgroup label="咖啡"><option value="咖啡-冰精品美式">冰精品美式</option><option value="咖啡-熱精品美式">熱精品美式</option><option value="咖啡-冰精品拿鐵">冰精品拿鐵</option><option value="咖啡-熱精品拿鐵">熱精品拿鐵</option></optgroup><optgroup label="手沖"><option value="手沖-冰瓜地馬拉">冰瓜地馬拉</option><option value="手沖-熱瓜地馬拉">熱瓜地馬拉</option><option value="手沖-冰哥倫比亞">冰哥倫比亞</option><option value="手沖-熱哥倫比亞">熱哥倫比亞</option><option value="手沖-冰衣索比亞">冰衣索比亞</option><option value="手沖-熱衣索比亞">熱衣索比亞</option></optgroup><optgroup label="純茶"><option value="純茶-冰皇家伯爵紅茶">冰皇家伯爵紅茶</option><option value="純茶-熱皇家伯爵紅茶">皇家伯爵紅茶</option><option value="純茶-冰慢焙金烏龍">冰慢焙金烏龍</option><option value="純茶-熱慢焙金烏龍">熱慢焙金烏龍</option></optgroup><optgroup label="風味"><option value="風味-冰特調可可飲">冰特調可可飲</option><option value="風味-熱特調可可飲">熱特調可可飲</option></optgroup></select></div><div class="form-group"><label for="add-voucher-amount">新增數量</label><input type="number" id="add-voucher-amount" class="form-input" placeholder="請輸入杯數" min="1"></div><div class="form-group"><label for="add-voucher-order-id">訂單編號</label><input type="text" id="add-voucher-order-id" class="form-input" placeholder="輸入訂單編號8碼"></div><div class="form-group"><label for="add-voucher-employee-id">員工認證</label><input type="password" id="add-voucher-employee-id" class="form-input" placeholder="請輸入您的員工編號"></div></div><button id="confirm-add-voucher-btn" class="btn btn-primary" style="margin-top:20px;">確認</button></div></div>
+        <div id="add-voucher-modal" class="modal-overlay hidden"><div class="modal-content"><span class="close-button" onclick="closeModal(this.parentElement.parentElement)">&times;</span><h2 class="modal-title">新增寄杯</h2><div class="form-grid"><div class="form-group"><label for="add-voucher-phone">會員電話號碼</label><input type="tel" id="add-voucher-phone" class="form-input" placeholder="請輸入顧客10碼電話"></div><div class="form-group"><label for="add-voucher-item">寄杯品項</label><select id="add-voucher-item" class="form-input"><option value="">-- 請選擇品項 --</option><optgroup label="咖啡"><option value="咖啡-冰精品美式">冰精品美式</option><option value="咖啡-熱精品美式">熱精品美式</option><option value="咖啡-冰精品拿鐵">冰精品拿鐵</option><option value="咖啡-熱精品拿鐵">熱精品拿鐵</option></optgroup><optgroup label="手沖"><option value="手沖-冰瓜地馬拉">冰瓜地馬拉</option><option value="手沖-熱瓜地馬拉">熱瓜地馬拉</option><option value="手沖-冰哥倫比亞">冰哥倫比亞</option><option value="手沖-熱哥倫比亞">熱哥倫比亞</option><option value="手沖-冰衣索比亞">冰衣索比亞</option><option value="手沖-熱衣索比亞">熱衣索比亞</option></optgroup><optgroup label="純茶"><option value="純茶-冰皇家伯爵紅茶">冰皇家伯爵紅茶</option><option value="純茶-熱皇家伯爵紅茶">皇家伯爵紅茶</option><option value="純茶-冰慢焙金烏龍">冰慢焙金烏龍</option><option value="純茶-熱慢焙金烏龍">熱慢焙金烏龍</option></optgroup><optgroup label="風味"><option value="風味-冰特調可可飲">冰特調可可飲</option><option value="風味-熱特調可可飲">熱特調可可飲</option></optgroup></select></div><div class="form-group"><label for="add-voucher-amount">新增數量</label><input type="number" id="add-voucher-amount" class="form-input" placeholder="請輸入杯數" min="1"></div><div class="form-group"><label for="add-voucher-own-cup">是否為自帶杯</label><select id="add-voucher-own-cup" class="form-input" style="background-color:#2a2a2a; color:#fff;"><option value="否">否</option><option value="是">是</option></select></div><div class="form-group"><label for="add-voucher-own-cup">是否為自帶杯</label><select id="add-voucher-own-cup" class="form-input" style="background-color:#2a2a2a; color:#fff;"><option value="否">否</option><option value="是">是</option></select></div><div class="form-group"><label for="add-voucher-order-id">訂單編號</label><input type="text" id="add-voucher-order-id" class="form-input" placeholder="輸入訂單編號8碼"></div><div class="form-group"><label for="add-voucher-employee-id">員工認證</label><input type="password" id="add-voucher-employee-id" class="form-input" placeholder="請輸入您的員工編號"></div></div><button id="confirm-add-voucher-btn" class="btn btn-primary" style="margin-top:20px;">確認</button></div></div>
         <div id="admin-verify-code-modal" class="modal-overlay hidden"><div class="modal-content"><span class="close-button" onclick="closeModal(this.parentElement.parentElement)">&times;</span><h2 class="modal-title">核銷寄杯</h2><div class="form-group"><label for="admin-redeem-code-input">會員驗證碼</label><input type="number" id="admin-redeem-code-input" class="form-input" placeholder="請輸入會員提供的6位數字"></div><div class="form-group"><label for="admin-redeem-employee-id">員工認證</label><input type="password" id="admin-redeem-employee-id" class="form-input" placeholder="請輸入您的員工編號"></div><button id="verify-redeem-code-btn" class="btn btn-primary" style="margin-top:20px;">驗證</button></div></div>
-        <div id="admin-confirm-redeem-modal" class="modal-overlay hidden">
-            <div class="modal-content">
-                <h2 class="modal-title">請確認核銷資訊</h2>
-                <div id="admin-confirm-redeem-details" class="confirm-details"></div>
-                <div class="confirm-buttons">
-                    <button id="cancel-redeem-btn" class="btn btn-secondary">取消</button>
-                    <button id="final-confirm-redeem-btn" class="btn btn-primary">確認核銷</button>
-                </div>
-            </div>
-        </div>
-        <div id="admin-confirm-add-modal" class="modal-overlay hidden"><div class="modal-content"><h2 class="modal-title">請確認新增資訊</h2>
-                </div>
-            </div>
-        </div>
-        <div id="admin-confirm-add-modal" class="modal-overlay hidden"><div class="modal-content"><h2 class="modal-title">請確認新增資訊</h2><div id="admin-confirm-add-details" class="confirm-details"></div><div class="confirm-buttons"><button id="cancel-add-btn" class="btn btn-secondary">取消</button><button id="final-confirm-add-btn" class="btn btn-primary">新增</button></div></div></div>
+        <div id="admin-confirm-redeem-modal" class="modal-overlay hidden"><div class="modal-content"><h2 class="modal-title" style="color:#cb9c65;">請確認核銷資訊</h2>
+
+<div id="admin-confirm-redeem-details" class="confirm-details"></div>
+<div class="form-group" style="margin-top:15px; text-align:left;"><label for="redeem-own-cup" style="color:#cb9c65;">是否為自帶杯</label><select id="redeem-own-cup" class="form-input" style="background-color:#2a2a2a; color:#fff;"><option value="否">否</option><option value="是">是</option></select></div>
+
+<div class="form-group" style="margin-top:15px; text-align:left;"><label for="redeem-own-cup" style="color:#cb9c65;">是否為自帶杯</label><select id="redeem-own-cup" class="form-input" style="background-color:#2a2a2a; color:#fff;"><option value="否">否</option><option value="是">是</option></select></div>
+<div class="confirm-buttons"><button id="cancel-redeem-btn" class="btn btn-secondary">取消</button><button id="final-confirm-redeem-btn" class="btn btn-primary">確認核銷</button></div></div></div>
+        <div id="admin-confirm-add-modal" class="modal-overlay hidden"><div class="modal-content"><h2 class="modal-title" style="color:#cb9c65;">請確認新增資訊</h2><div id="admin-confirm-add-details" class="confirm-details"></div><div class="confirm-buttons"><button id="cancel-add-btn" class="btn btn-secondary">取消</button><button id="final-confirm-add-btn" class="btn btn-primary">新增</button></div></div></div>
 
         <div id="qr-reader-container" class="hidden"><p style="color: white; margin-bottom: 15px;">請掃描集點卡 QR Code</p><div id="qr-reader"></div><button id="close-qr-reader" class="btn btn-secondary" style="margin-top: 20px; width: auto; background-color: #aaa;">關閉掃描</button></div>
 
@@ -564,8 +659,18 @@
             if (el) el.addEventListener(event, func);
         }
 
-        function showLoader() { const el = document.getElementById('loading-modal'); if(el) el.classList.remove('hidden'); }
-        function hideLoader() { const el = document.getElementById('loading-modal'); if(el) el.classList.add('hidden'); }
+        let globalLoaderTimeout = null;
+        function showLoader() { 
+            const el = document.getElementById('loading-modal'); 
+            if(el) el.classList.remove('hidden'); 
+            if(globalLoaderTimeout) clearTimeout(globalLoaderTimeout);
+            globalLoaderTimeout = setTimeout(() => { hideLoader(); }, 10000); 
+        }
+        function hideLoader() { 
+            const el = document.getElementById('loading-modal'); 
+            if(el) el.classList.add('hidden'); 
+            if(globalLoaderTimeout) clearTimeout(globalLoaderTimeout);
+        }
         function openModal(modal) { if(modal) modal.classList.remove('hidden'); }
         function closeModal(modal) { if(modal) modal.classList.add('hidden'); }
         function showPage(page) { document.querySelectorAll('.page-section').forEach(p => p.classList.add('hidden')); if(page) page.classList.remove('hidden'); }
@@ -596,7 +701,7 @@
 
         function handleLogin() {
             const input = document.getElementById('login-phone-input').value.trim();
-            if (!input) { alert('請輸入電話號碼或員工編號'); return; }
+            if (!input) { alert('請輸入電話號碼'); return; }
             
             showLoader(); isCouponsLoaded = false;
             let apiUrl = `${SCRIPT_URL}?action=query&phone=${input}`;
@@ -621,8 +726,8 @@
                         currentCustomerInfo = { lastName: result.data.lastName, title: result.data.title };
                         showPage(document.getElementById('customer-home-page')); 
                         updateGreeting('customer-time-greeting', 'customer-name-greeting', result.data.lastName + result.data.title);
-                        document.getElementById('points-balance').textContent = result.data.points; 
-                        document.getElementById('voucher-balance').textContent = result.data.vouchers;
+                        document.getElementById('points-balance').textContent = result.data.points; if(document.getElementById('points-page-balance')) document.getElementById('points-page-balance').textContent = result.data.points; if(document.getElementById('points-page-balance')) document.getElementById('points-page-balance').textContent = result.data.points; 
+                        document.getElementById('voucher-balance').textContent = result.data.vouchers; if(document.getElementById('vouchers-page-balance')) document.getElementById('vouchers-page-balance').textContent = result.data.vouchers; if(document.getElementById('vouchers-page-balance')) document.getElementById('vouchers-page-balance').textContent = result.data.vouchers;
                         updateMemberLevelUI(result.data.annualPoints); 
                         fetchCouponData();
                     } else { 
@@ -655,8 +760,8 @@
                     currentCustomerInfo = { lastName, title }; 
                     showPage(document.getElementById('customer-home-page')); 
                     updateGreeting('customer-time-greeting', 'customer-name-greeting', lastName + title); 
-                    document.getElementById('points-balance').textContent = 0; 
-                    document.getElementById('voucher-balance').textContent = 0; 
+                    document.getElementById('points-balance').textContent = 0; if(document.getElementById('points-page-balance')) document.getElementById('points-page-balance').textContent = 0; if(document.getElementById('points-page-balance')) document.getElementById('points-page-balance').textContent = 0; 
+                    document.getElementById('voucher-balance').textContent = 0; if(document.getElementById('vouchers-page-balance')) document.getElementById('vouchers-page-balance').textContent = 0; if(document.getElementById('vouchers-page-balance')) document.getElementById('vouchers-page-balance').textContent = 0; 
                     updateMemberLevelUI(0); 
                 } else { alert('⚠️ ' + (result.message || '註冊失敗')); } 
             }).catch(err => { hideLoader(); alert('🚫 網路或伺服器錯誤'); }); 
@@ -698,7 +803,7 @@
         window.showMemberDetailPage = function() {
              if(!currentCustomerPhone) return;
              const p = currentAnnualPoints;
-             let levelName = '可可白賞'; let levelColor = '#4a2c2a';
+             let levelName = '可可白賞'; let levelColor = '#cb9c65';
              if (p < LEVEL_THRESHOLDS.LV1) { levelColor = '#9E9E9E'; levelName = '可可白賞'; } 
              else if (p < LEVEL_THRESHOLDS.LV2) { levelColor = '#CD7F32'; levelName = '可可銅賞'; }
              else if (p < LEVEL_THRESHOLDS.LV3) { levelColor = '#7F7F7F'; levelName = '可可銀賞'; }
@@ -882,7 +987,7 @@
                 const history = globalVoucherData.history.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
                 
                 if (role === 'admin') {
-                    container.innerHTML = '<h3 style="color:#6d4c41; margin-bottom:15px; font-size:1.1em;">詳細寄杯與核銷紀錄</h3>';
+                    container.innerHTML = '<h3 style="color:#cca677; margin-bottom:15px; font-size:1.1em;">詳細寄杯與核銷紀錄</h3>';
                 }
 
                 if (history.length === 0) {
@@ -956,7 +1061,7 @@
                     if(res.status === 'redeemed') {
                         clearInterval(pollingInterval); clearInterval(countdownInterval);
                         const displayDiv = document.getElementById('verification-code-display'); if(displayDiv) { displayDiv.innerHTML = "<span style='color:#27ae60;'>✔ 核銷成功</span>"; displayDiv.style.fontSize = "2.5em"; } document.getElementById('countdown-timer').parentElement.style.display = 'none';
-                        if(currentCustomerPhone) { fetch(`${SCRIPT_URL}?action=query&phone=${currentCustomerPhone}`).then(r=>r.json()).then(result => { if(result.found) { document.getElementById('voucher-balance').textContent = result.data.vouchers; document.getElementById('points-balance').textContent = result.data.points; } }); }
+                        if(currentCustomerPhone) { fetch(`${SCRIPT_URL}?action=query&phone=${currentCustomerPhone}`).then(r=>r.json()).then(result => { if(result.found) { document.getElementById('voucher-balance').textContent = result.data.vouchers; if(document.getElementById('vouchers-page-balance')) document.getElementById('vouchers-page-balance').textContent = result.data.vouchers; if(document.getElementById('vouchers-page-balance')) document.getElementById('vouchers-page-balance').textContent = result.data.vouchers; document.getElementById('points-balance').textContent = result.data.points; if(document.getElementById('points-page-balance')) document.getElementById('points-page-balance').textContent = result.data.points; if(document.getElementById('points-page-balance')) document.getElementById('points-page-balance').textContent = result.data.points; } }); }
                         setTimeout(() => { 
                             closeModal(document.getElementById('show-code-modal')); 
                             if(!document.getElementById('voucher-history-page').classList.contains('hidden')) {
@@ -1137,7 +1242,7 @@
                 hideLoader(); 
                 if (res.status === 'success') { 
                     alert('✅ 兌換成功！'); 
-                    document.getElementById('points-balance').textContent = res.newPoints; 
+                    document.getElementById('points-balance').textContent = res.newPoints; if(document.getElementById('points-page-balance')) document.getElementById('points-page-balance').textContent = res.newPoints; if(document.getElementById('points-page-balance')) document.getElementById('points-page-balance').textContent = res.newPoints; 
                     document.getElementById('page-current-points').textContent = res.newPoints; 
                     updateMemberLevelUI(res.annualPoints); 
                     closeModal(document.getElementById('point-redeem-confirm-modal')); 
@@ -1175,10 +1280,10 @@
                         hideLoader(); 
                         if(res.status === 'success') { 
                             alert(res.message); 
-                            document.getElementById('points-balance').textContent = res.newPoints; 
+                            document.getElementById('points-balance').textContent = res.newPoints; if(document.getElementById('points-page-balance')) document.getElementById('points-page-balance').textContent = res.newPoints; if(document.getElementById('points-page-balance')) document.getElementById('points-page-balance').textContent = res.newPoints; 
                             updateMemberLevelUI(res.annualPoints); 
                         } else alert('掃描失敗: ' + res.message); 
-                    }); 
+                    }).catch(err => { hideLoader(); alert('連線錯誤或掃描失敗'); }); 
                 }).catch(err => { qrContainer.classList.add('hidden'); }); 
             }).catch(err => { 
                 if(!err?.message?.includes("already running")) { 
@@ -1191,10 +1296,10 @@
         function closeQRScanner() { const qrContainer = document.getElementById('qr-reader-container'); if (html5QrCodeScanner) { html5QrCodeScanner.stop().then(() => { qrContainer.classList.add('hidden'); }).catch(() => { qrContainer.classList.add('hidden'); }); } else { qrContainer.classList.add('hidden'); } }
         function handleAdminLookup() { const phone = document.getElementById('lookup-phone-input').value.trim(); if (!/^\d{10}$/.test(phone)) { alert('電話號碼格式錯誤'); return; } showLoader(); fetch(`${SCRIPT_URL}?action=query&phone=${phone}`).then(r => r.json()).then(result => { hideLoader(); if (result.status === 'success') { if (result.found) { searchedPhone = result.data; document.getElementById('result-name-display').textContent = `${result.data.lastName}${result.data.title}`; const ap = parseInt(result.data.annualPoints) || 0; let levelName = '可可白賞'; if (ap >= LEVEL_THRESHOLDS.LV3) levelName = '可可金賞'; else if (ap >= LEVEL_THRESHOLDS.LV2) levelName = '可可銀賞'; else if (ap >= LEVEL_THRESHOLDS.LV1) levelName = '可可銅賞'; document.getElementById('result-level-display').textContent = levelName; document.getElementById('result-points').textContent = result.data.points; document.getElementById('result-vouchers').textContent = result.data.vouchers; document.getElementById('lookup-results').classList.remove('hidden'); } else { searchedPhone = null; document.getElementById('lookup-results').classList.add('hidden'); alert('查無此會員資料。'); } } else { searchedPhone = null; alert('系統錯誤'); } }).catch(err => { hideLoader(); alert('連線錯誤'); }); }
         function openAddVoucherModal() { const phoneInput = document.getElementById('add-voucher-phone'); if (searchedPhone && searchedPhone.phone) phoneInput.value = searchedPhone.phone; else phoneInput.value = ''; document.getElementById('add-voucher-item').value = ''; document.getElementById('add-voucher-amount').value = ''; document.getElementById('add-voucher-order-id').value = ''; document.getElementById('add-voucher-employee-id').value = ''; openModal(document.getElementById('add-voucher-modal')); }
-        function handleConfirmAddVoucher() { const phone = document.getElementById('add-voucher-phone').value.trim(); const item = document.getElementById('add-voucher-item').value; const amount = document.getElementById('add-voucher-amount').value; const orderId = document.getElementById('add-voucher-order-id').value.trim(); const employeeId = document.getElementById('add-voucher-employee-id').value; if (!/^\d{10}$/.test(phone) || !item || !amount || !orderId || !employeeId) { alert('請填寫完整資訊'); return; } pendingAddVoucherData = { action: 'addVoucher', phone, item, amount, orderId, employeeId }; document.getElementById('admin-confirm-add-details').innerHTML = `<p>會員: ${phone}</p><p>品項: ${item}</p><p>數量: ${amount}</p>`; closeModal(document.getElementById('add-voucher-modal')); openModal(document.getElementById('admin-confirm-add-modal')); }
+        function handleConfirmAddVoucher() { const phone = document.getElementById('add-voucher-phone').value.trim(); const item = document.getElementById('add-voucher-item').value; const amount = document.getElementById('add-voucher-amount').value; const orderId = document.getElementById('add-voucher-order-id').value.trim(); const employeeId = document.getElementById('add-voucher-employee-id').value; if (!/^\d{10}$/.test(phone) || !item || !amount || !orderId || !employeeId) { alert('請填寫完整資訊'); return; } const ownCup = document.getElementById('add-voucher-own-cup').value; pendingAddVoucherData = { action: 'addVoucher', phone, item, amount, orderId, employeeId, ownCup }; document.getElementById('admin-confirm-add-details').innerHTML = `<p>會員: ${phone}</p><p>品項: ${item}</p><p>數量: ${amount}</p><p style='color:#cb9c65; font-weight:bold;'>自帶杯: ${ownCup}</p>`; closeModal(document.getElementById('add-voucher-modal')); openModal(document.getElementById('admin-confirm-add-modal')); }
         function handleFinalAddVoucher() { showLoader(); fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(pendingAddVoucherData) }).then(r => r.json()).then(res => { hideLoader(); closeModal(document.getElementById('admin-confirm-add-modal')); if(res.status==='success') { alert('新增成功'); if(searchedPhone && searchedPhone.phone === pendingAddVoucherData.phone) { handleAdminLookup(); } } else alert('新增失敗'); pendingAddVoucherData = null; }).catch(() => { hideLoader(); alert('連線錯誤'); }); }
-        function handleVerifyRedeemCode() { const code = document.getElementById('admin-redeem-code-input').value; const employeeId = document.getElementById('admin-redeem-employee-id').value; if (!code || !employeeId) { alert('請輸入完整資訊'); return; } showLoader(); fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'processRedemption', step: 'verify', code, employeeId }) }).then(r => r.json()).then(result => { hideLoader(); if(result.status === 'success') { const data = result.data; const orderIdDisplay = data.orderId ? data.orderId : '無訂單號碼'; document.getElementById('admin-confirm-redeem-details').innerHTML = `<p>會員: ${data.customerName}</p><p>品項: ${data.item}</p><p>數量: ${data.amount}</p><p>單號: <strong style="color:#6a1d7b;">${orderIdDisplay}</strong></p>`; verificationCode = code; closeModal(document.getElementById('admin-verify-code-modal')); openModal(document.getElementById('admin-confirm-redeem-modal')); } else { alert('驗證失敗'); } }).catch(() => { hideLoader(); alert('連線錯誤'); }); }
-        function handleFinalConfirmRedeem() { const employeeId = document.getElementById('admin-redeem-employee-id').value; showLoader(); fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'processRedemption', step: 'confirm', code: verificationCode, employeeId }) }).then(r => r.json()).then(result => { hideLoader(); if(result.status === 'success') { alert('核銷成功'); closeModal(document.getElementById('admin-confirm-redeem-modal')); if(searchedPhone) handleAdminLookup(); } else { alert('核銷失敗'); } }).catch(() => { hideLoader(); alert('連線錯誤'); }); }
+        function handleVerifyRedeemCode() { const code = document.getElementById('admin-redeem-code-input').value; const employeeId = document.getElementById('admin-redeem-employee-id').value; if (!code || !employeeId) { alert('請輸入完整資訊'); return; } showLoader(); fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'processRedemption', step: 'verify', code, employeeId }) }).then(r => r.json()).then(result => { hideLoader(); if(result.status === 'success') { const data = result.data; document.getElementById('admin-confirm-redeem-details').innerHTML = `<p>會員: ${data.customerName}</p><p>品項: ${data.item}</p><p>數量: ${data.amount}</p>`; verificationCode = code; closeModal(document.getElementById('admin-verify-code-modal')); openModal(document.getElementById('admin-confirm-redeem-modal')); } else { alert('驗證失敗'); } }).catch(() => { hideLoader(); alert('連線錯誤'); }); }
+        function handleFinalConfirmRedeem() { const employeeId = document.getElementById('admin-redeem-employee-id').value; showLoader(); const ownCup = document.getElementById('redeem-own-cup').value; fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'processRedemption', step: 'confirm', code: verificationCode, employeeId, ownCup }) }).then(r => r.json()).then(result => { hideLoader(); if(result.status === 'success') { alert('核銷成功'); closeModal(document.getElementById('admin-confirm-redeem-modal')); if(searchedPhone) handleAdminLookup(); } else { alert('核銷失敗'); } }).catch(() => { hideLoader(); alert('連線錯誤'); }); }
         function handleAdminSendCoupon() { const phone = document.getElementById('send-coupon-phone').value.trim(); const typeSelect = document.getElementById('send-coupon-type'); let type = typeSelect.value; const qty = parseInt(document.getElementById('send-coupon-qty').value); const targetMode = document.getElementById('send-target-mode').value; const expiryInput = document.getElementById('send-coupon-expiry').value; if (type === 'other') { const customName = document.getElementById('send-coupon-custom-name').value.trim(); if (!customName) { alert('請輸入優惠卷名稱'); return; } type = `other:${customName}`; } let payload = { action: 'sendCoupon', type, qty, employeeId: currentAdminId, targetMode, expiry: expiryInput, desc: document.getElementById('send-coupon-desc').value.trim() }; if (targetMode === 'phone') { if (!phone || !/^\d{10}$/.test(phone)) { alert('請輸入正確電話'); return; } payload.phone = phone; } else { payload.level = document.getElementById('send-coupon-level').value; } if (!type || !qty) { alert('請填寫完整'); return; } if (targetMode === 'level' && !confirm(`確定要派發給「${document.getElementById('send-coupon-level').selectedOptions[0].text}」嗎？`)) return; showLoader(); fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) }).then(r => r.json()).then(res => { hideLoader(); if(res.status === 'success') { alert('✅ 派發成功！'); closeModal(document.getElementById('admin-send-coupon-modal')); } else { alert('⚠️ 派發失敗：' + res.message); } }).catch(() => { hideLoader(); alert('連線錯誤'); }); }
 
         document.addEventListener('DOMContentLoaded', function() {
@@ -1219,6 +1324,16 @@
             // ★★★ 顧客與管理員都使用新的 logout 函數 ★★★
             safeBindListener('customer-logout-button', 'click', logout);
             safeBindListener('admin-logout-button', 'click', logout);
+            
+            
+            safeBindListener('grid-points-btn', 'click', () => showPage(document.getElementById('customer-points-page')));
+            safeBindListener('grid-vouchers-btn', 'click', () => showPage(document.getElementById('customer-vouchers-page')));
+            safeBindListener('grid-events-btn', 'click', () => showPage(document.getElementById('special-events-page')));
+            safeBindListener('grid-contact-btn', 'click', openContactSupportPage);
+
+            safeBindListener('back-from-points-page', 'click', () => showPage(document.getElementById('customer-home-page')));
+            safeBindListener('back-from-vouchers-page', 'click', () => showPage(document.getElementById('customer-home-page')));
+            safeBindListener('back-from-events-page', 'click', () => showPage(document.getElementById('customer-home-page')));
             
             safeBindListener('add-points-btn', 'click', openQRScanner);
             safeBindListener('redeem-points-btn', 'click', openRedeemPointsPage);
@@ -1310,8 +1425,8 @@
                                         currentCustomerInfo = { lastName: res.data.lastName, title: res.data.title };
                                         showPage(document.getElementById('customer-home-page')); 
                                         updateGreeting('customer-time-greeting', 'customer-name-greeting', res.data.lastName + res.data.title);
-                                        document.getElementById('points-balance').textContent = res.data.points; 
-                                        document.getElementById('voucher-balance').textContent = res.data.vouchers;
+                                        document.getElementById('points-balance').textContent = res.data.points; if(document.getElementById('points-page-balance')) document.getElementById('points-page-balance').textContent = res.data.points; if(document.getElementById('points-page-balance')) document.getElementById('points-page-balance').textContent = res.data.points; 
+                                        document.getElementById('voucher-balance').textContent = res.data.vouchers; if(document.getElementById('vouchers-page-balance')) document.getElementById('vouchers-page-balance').textContent = res.data.vouchers; if(document.getElementById('vouchers-page-balance')) document.getElementById('vouchers-page-balance').textContent = res.data.vouchers;
                                         updateMemberLevelUI(res.data.annualPoints); 
                                         fetchCouponData();
                                     } else {
