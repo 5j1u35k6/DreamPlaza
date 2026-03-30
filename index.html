@@ -79,7 +79,8 @@
         .title-sub { font-size: 1.2em; color: #cca677; margin: 10px 0 0 0; }
         .title-store { font-size: 1em; color: #bbbbbb; margin: 5px 0 30px 0; font-weight: normal; }
         .input-group { margin-bottom: 20px; width: 100%; }
-        .form-input { width: 100%; padding: 12px 15px; font-size: 16px; border: 1px solid #444; border-radius: 8px; box-sizing: border-box; text-align: center; background-color: #2a2a2a; }
+        .form-input { width: 100%; padding: 12px 15px; font-size: 16px; border: 1px solid #444; border-radius: 8px; box-sizing: border-box; text-align: center; background-color: #2a2a2a; color: #f0f0f0; }
+        .form-input::placeholder { color: #888; }
         .form-input:disabled, .form-input[readonly] { background-color: #e0e0e0 !important; color: #555 !important; cursor: not-allowed; border-color: #ccc; opacity: 1; -webkit-text-fill-color: #555; }
         .button-group { display: flex; flex-direction: column; gap: 15px; width: 100%; }
         .btn { padding: 15px 20px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: all 0.3s ease; width: 100%; box-sizing: border-box; }
@@ -188,6 +189,7 @@
         .voucher-info { text-align: left; display: flex; align-items: center; gap: 15px; }
         .voucher-icon { width: 50px; height: 50px; background-color: #121212; color: #f0f0f0; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; color: #6a1d7b; }
         .voucher-name { font-size: 1.1em; font-weight: bold; color: #f0f0f0; margin-bottom: 4px; display: block; }
+        .own-cup-tag { background: #cb9c65; color: #000; font-size: 0.75em; font-weight: bold; padding: 2px 6px; border-radius: 4px; margin-left: 8px; vertical-align: middle; }
         .voucher-count { font-size: 0.9em; color: #aaaaaa; }
         .voucher-count strong { color: #cb9c65; font-size: 1.2em; }
         
@@ -607,14 +609,11 @@
 
         <div id="admin-send-coupon-modal" class="modal-overlay hidden"><div class="modal-content"><span class="close-button" onclick="closeModal(document.getElementById('admin-send-coupon-modal'))">&times;</span><h2 class="modal-title">派發優惠卷</h2><div class="form-grid"><div class="form-group"><label for="send-target-mode">派發對象</label><select id="send-target-mode" class="form-input"><option value="phone">單一會員 (輸入電話)</option><option value="level">會員等級 (批次派發)</option></select></div><div id="target-phone-group" class="form-group"><label for="send-coupon-phone">會員電話</label><input type="tel" id="send-coupon-phone" class="form-input" placeholder="請輸入會員電話"></div><div id="target-level-group" class="form-group hidden"><label for="send-coupon-level">選擇會員等級</label><select id="send-coupon-level" class="form-input"><option value="all">所有會員</option><option value="white">可可白賞</option><option value="bronze">可可銅賞</option><option value="silver">可可銀賞</option><option value="gold">可可金賞</option></select><p style="font-size: 0.8em; color: #c0392b; margin-top: 5px;">注意：批次派發需要處理較多資料，請耐心等待。</p></div><div class="form-group"><label for="send-coupon-type">優惠卷類型</label><select id="send-coupon-type" class="form-input"><option value="">-- 請選擇 --</option><option value="gift_americano">美式咖啡兌換卷</option><option value="gift_bogo">飲品買一送一卷</option><option value="coupon_5">5% 回饋優惠卷</option><option value="coupon_8">8% 回饋優惠卷</option><option value="coupon_10">10% 回饋優惠卷</option><option value="gift_gold">金賞好禮兌換卷</option><option value="other">其他 (自訂名稱)</option></select></div><div id="custom-coupon-name-group" class="form-group hidden"><label for="send-coupon-custom-name">優惠卷名稱</label><input type="text" id="send-coupon-custom-name" class="form-input" placeholder="例如：生日禮、補償卷"></div><div class="form-group"><label for="send-coupon-desc">票卷說明 (選填，將顯示於顧客端)</label><textarea id="send-coupon-desc" class="form-input" rows="3" placeholder="例如：僅限今日使用、需出示身分證..."></textarea></div><div class="form-group"><label for="send-coupon-expiry">有效期限 (選填，預設永久有效)</label><input type="date" id="send-coupon-expiry" class="form-input"></div><div class="form-group"><label for="send-coupon-qty">數量</label><input type="number" id="send-coupon-qty" class="form-input" value="1" min="1" max="10"></div></div><button id="confirm-send-coupon-btn" class="btn btn-primary" style="margin-top:20px;">確認派發</button></div></div>
         
-        <div id="add-voucher-modal" class="modal-overlay hidden"><div class="modal-content"><span class="close-button" onclick="closeModal(this.parentElement.parentElement)">&times;</span><h2 class="modal-title">新增寄杯</h2><div class="form-grid"><div class="form-group"><label for="add-voucher-phone">會員電話號碼</label><input type="tel" id="add-voucher-phone" class="form-input" placeholder="請輸入顧客10碼電話"></div><div class="form-group"><label for="add-voucher-item">寄杯品項</label><select id="add-voucher-item" class="form-input"><option value="">-- 請選擇品項 --</option><optgroup label="咖啡"><option value="咖啡-冰精品美式">冰精品美式</option><option value="咖啡-熱精品美式">熱精品美式</option><option value="咖啡-冰精品拿鐵">冰精品拿鐵</option><option value="咖啡-熱精品拿鐵">熱精品拿鐵</option></optgroup><optgroup label="手沖"><option value="手沖-冰瓜地馬拉">冰瓜地馬拉</option><option value="手沖-熱瓜地馬拉">熱瓜地馬拉</option><option value="手沖-冰哥倫比亞">冰哥倫比亞</option><option value="手沖-熱哥倫比亞">熱哥倫比亞</option><option value="手沖-冰衣索比亞">冰衣索比亞</option><option value="手沖-熱衣索比亞">熱衣索比亞</option></optgroup><optgroup label="純茶"><option value="純茶-冰皇家伯爵紅茶">冰皇家伯爵紅茶</option><option value="純茶-熱皇家伯爵紅茶">皇家伯爵紅茶</option><option value="純茶-冰慢焙金烏龍">冰慢焙金烏龍</option><option value="純茶-熱慢焙金烏龍">熱慢焙金烏龍</option></optgroup><optgroup label="風味"><option value="風味-冰特調可可飲">冰特調可可飲</option><option value="風味-熱特調可可飲">熱特調可可飲</option></optgroup></select></div><div class="form-group"><label for="add-voucher-amount">新增數量</label><input type="number" id="add-voucher-amount" class="form-input" placeholder="請輸入杯數" min="1"></div><div class="form-group"><label for="add-voucher-own-cup">是否為自帶杯</label><select id="add-voucher-own-cup" class="form-input" style="background-color:#2a2a2a; color:#fff;"><option value="否">否</option><option value="是">是</option></select></div><div class="form-group"><label for="add-voucher-own-cup">是否為自帶杯</label><select id="add-voucher-own-cup" class="form-input" style="background-color:#2a2a2a; color:#fff;"><option value="否">否</option><option value="是">是</option></select></div><div class="form-group"><label for="add-voucher-order-id">訂單編號</label><input type="text" id="add-voucher-order-id" class="form-input" placeholder="輸入訂單編號8碼"></div><div class="form-group"><label for="add-voucher-employee-id">員工認證</label><input type="password" id="add-voucher-employee-id" class="form-input" placeholder="請輸入您的員工編號"></div></div><button id="confirm-add-voucher-btn" class="btn btn-primary" style="margin-top:20px;">確認</button></div></div>
+        <div id="add-voucher-modal" class="modal-overlay hidden"><div class="modal-content"><span class="close-button" onclick="closeModal(this.parentElement.parentElement)">&times;</span><h2 class="modal-title">新增寄杯</h2><div class="form-grid"><div class="form-group"><label for="add-voucher-phone">會員電話號碼</label><input type="tel" id="add-voucher-phone" class="form-input" placeholder="請輸入顧客10碼電話"></div><div class="form-group"><label for="add-voucher-item">寄杯品項</label><select id="add-voucher-item" class="form-input"><option value="">-- 請選擇品項 --</option><optgroup label="咖啡"><option value="咖啡-冰精品美式">冰精品美式</option><option value="咖啡-熱精品美式">熱精品美式</option><option value="咖啡-冰精品拿鐵">冰精品拿鐵</option><option value="咖啡-熱精品拿鐵">熱精品拿鐵</option></optgroup><optgroup label="手沖"><option value="手沖-冰瓜地馬拉">冰瓜地馬拉</option><option value="手沖-熱瓜地馬拉">熱瓜地馬拉</option><option value="手沖-冰哥倫比亞">冰哥倫比亞</option><option value="手沖-熱哥倫比亞">熱哥倫比亞</option><option value="手沖-冰衣索比亞">冰衣索比亞</option><option value="手沖-熱衣索比亞">熱衣索比亞</option></optgroup><optgroup label="純茶"><option value="純茶-冰皇家伯爵紅茶">冰皇家伯爵紅茶</option><option value="純茶-熱皇家伯爵紅茶">皇家伯爵紅茶</option><option value="純茶-冰慢焙金烏龍">冰慢焙金烏龍</option><option value="純茶-熱慢焙金烏龍">熱慢焙金烏龍</option></optgroup><optgroup label="風味"><option value="風味-冰特調可可飲">冰特調可可飲</option><option value="風味-熱特調可可飲">熱特調可可飲</option></optgroup></select></div><div class="form-group"><label for="add-voucher-amount">新增數量</label><input type="number" id="add-voucher-amount" class="form-input" placeholder="請輸入杯數" min="1"></div><div class="form-group"><label for="add-voucher-own-cup">是否為自帶杯</label><select id="add-voucher-own-cup" class="form-input"><option value="否">否</option><option value="是">是</option></select></div><div class="form-group"><label for="add-voucher-order-id">訂單編號</label><input type="text" id="add-voucher-order-id" class="form-input" placeholder="輸入訂單編號8碼"></div><div class="form-group"><label for="add-voucher-employee-id">員工認證</label><input type="password" id="add-voucher-employee-id" class="form-input" placeholder="請輸入您的員工編號"></div></div><button id="confirm-add-voucher-btn" class="btn btn-primary" style="margin-top:20px;">確認</button></div></div>
         <div id="admin-verify-code-modal" class="modal-overlay hidden"><div class="modal-content"><span class="close-button" onclick="closeModal(this.parentElement.parentElement)">&times;</span><h2 class="modal-title">核銷寄杯</h2><div class="form-group"><label for="admin-redeem-code-input">會員驗證碼</label><input type="number" id="admin-redeem-code-input" class="form-input" placeholder="請輸入會員提供的6位數字"></div><div class="form-group"><label for="admin-redeem-employee-id">員工認證</label><input type="password" id="admin-redeem-employee-id" class="form-input" placeholder="請輸入您的員工編號"></div><button id="verify-redeem-code-btn" class="btn btn-primary" style="margin-top:20px;">驗證</button></div></div>
         <div id="admin-confirm-redeem-modal" class="modal-overlay hidden"><div class="modal-content"><h2 class="modal-title" style="color:#cb9c65;">請確認核銷資訊</h2>
 
 <div id="admin-confirm-redeem-details" class="confirm-details"></div>
-<div class="form-group" style="margin-top:15px; text-align:left;"><label for="redeem-own-cup" style="color:#cb9c65;">是否為自帶杯</label><select id="redeem-own-cup" class="form-input" style="background-color:#2a2a2a; color:#fff;"><option value="否">否</option><option value="是">是</option></select></div>
-
-<div class="form-group" style="margin-top:15px; text-align:left;"><label for="redeem-own-cup" style="color:#cb9c65;">是否為自帶杯</label><select id="redeem-own-cup" class="form-input" style="background-color:#2a2a2a; color:#fff;"><option value="否">否</option><option value="是">是</option></select></div>
 <div class="confirm-buttons"><button id="cancel-redeem-btn" class="btn btn-secondary">取消</button><button id="final-confirm-redeem-btn" class="btn btn-primary">確認核銷</button></div></div></div>
         <div id="admin-confirm-add-modal" class="modal-overlay hidden"><div class="modal-content"><h2 class="modal-title" style="color:#cb9c65;">請確認新增資訊</h2><div id="admin-confirm-add-details" class="confirm-details"></div><div class="confirm-buttons"><button id="cancel-add-btn" class="btn btn-secondary">取消</button><button id="final-confirm-add-btn" class="btn btn-primary">新增</button></div></div></div>
 
@@ -966,22 +965,37 @@
             
             if (currentVoucherTab === 'available') {
                 let hasItems = false;
-                for (const [item, count] of Object.entries(globalVoucherData.summary)) {
+                for (const [key, count] of Object.entries(globalVoucherData.summary)) {
                     if (count > 0) {
                         hasItems = true;
+                        
+                        let displayItem = key;
+                        let ownCupStatus = '否';
+                        let tagHtml = '';
+                        
+                        if (key.includes('|')) {
+                            const parts = key.split('|');
+                            displayItem = parts[0];
+                            ownCupStatus = parts[1];
+                        }
+                        
+                        if (ownCupStatus === '是') {
+                            tagHtml = '<span class="own-cup-tag">自帶杯</span>';
+                        }
+
                         const card = document.createElement('div');
                         card.className = 'voucher-card';
                         card.innerHTML = `
                             <div class="voucher-info">
                                 <div class="voucher-icon">☕</div>
                                 <div>
-                                    <span class="voucher-name">${item}</span>
+                                    <span class="voucher-name">${displayItem}${tagHtml}</span>
                                     <span class="voucher-count">剩餘 <strong>${count}</strong> 杯</span>
                                 </div>
                             </div>
-                            <button class="btn-redeem" data-item="${item}">核銷</button>
+                            <button class="btn-redeem" data-item="${displayItem}">核銷</button>
                         `;
-                        card.querySelector('.btn-redeem').addEventListener('click', () => handleVoucherRedeemClick(item, count, currentCustomerPhone, nameInfo));
+                        card.querySelector('.btn-redeem').addEventListener('click', () => handleVoucherRedeemClick(displayItem, count, currentCustomerPhone, nameInfo, ownCupStatus));
                         container.appendChild(card);
                     }
                 }
@@ -1024,7 +1038,7 @@
             }
         }
 
-        function handleVoucherRedeemClick(item, maxAmount, phone, nameInfo) {
+        function handleVoucherRedeemClick(item, maxAmount, phone, nameInfo, ownCupStatus) {
              const amount = prompt(`您要核銷幾杯「${item}」？\n(此品項還剩下 ${maxAmount} 杯可核銷)`, 1);
              if (amount && parseInt(amount) > 0 && parseInt(amount) <= maxAmount) {
                  showLoader();
@@ -1036,7 +1050,8 @@
                          item, 
                          amount, 
                          lastName: currentCustomerInfo.lastName, 
-                         title: currentCustomerInfo.title 
+                         title: currentCustomerInfo.title,
+                         ownCup: ownCupStatus 
                      }) 
                  })
                  .then(r => r.json())
@@ -1302,8 +1317,8 @@
         function openAddVoucherModal() { const phoneInput = document.getElementById('add-voucher-phone'); if (searchedPhone && searchedPhone.phone) phoneInput.value = searchedPhone.phone; else phoneInput.value = ''; document.getElementById('add-voucher-item').value = ''; document.getElementById('add-voucher-amount').value = ''; document.getElementById('add-voucher-order-id').value = ''; document.getElementById('add-voucher-employee-id').value = ''; openModal(document.getElementById('add-voucher-modal')); }
         function handleConfirmAddVoucher() { const phone = document.getElementById('add-voucher-phone').value.trim(); const item = document.getElementById('add-voucher-item').value; const amount = document.getElementById('add-voucher-amount').value; const orderId = document.getElementById('add-voucher-order-id').value.trim(); const employeeId = document.getElementById('add-voucher-employee-id').value; if (!/^\d{10}$/.test(phone) || !item || !amount || !orderId || !employeeId) { alert('請填寫完整資訊'); return; } const ownCup = document.getElementById('add-voucher-own-cup').value; pendingAddVoucherData = { action: 'addVoucher', phone, item, amount, orderId, employeeId, ownCup }; document.getElementById('admin-confirm-add-details').innerHTML = `<p>會員: ${phone}</p><p>品項: ${item}</p><p>數量: ${amount}</p><p style='color:#cb9c65; font-weight:bold;'>自帶杯: ${ownCup}</p>`; closeModal(document.getElementById('add-voucher-modal')); openModal(document.getElementById('admin-confirm-add-modal')); }
         function handleFinalAddVoucher() { showLoader(); fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(pendingAddVoucherData) }).then(r => r.json()).then(res => { hideLoader(); closeModal(document.getElementById('admin-confirm-add-modal')); if(res.status==='success') { alert('新增成功'); if(searchedPhone && searchedPhone.phone === pendingAddVoucherData.phone) { handleAdminLookup(); } } else alert('新增失敗'); pendingAddVoucherData = null; }).catch(() => { hideLoader(); alert('連線錯誤'); }); }
-        function handleVerifyRedeemCode() { const code = document.getElementById('admin-redeem-code-input').value; const employeeId = document.getElementById('admin-redeem-employee-id').value; if (!code || !employeeId) { alert('請輸入完整資訊'); return; } showLoader(); fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'processRedemption', step: 'verify', code, employeeId }) }).then(r => r.json()).then(result => { hideLoader(); if(result.status === 'success') { const data = result.data; document.getElementById('admin-confirm-redeem-details').innerHTML = `<p>會員: ${data.customerName}</p><p>品項: ${data.item}</p><p>數量: ${data.amount}</p>`; verificationCode = code; closeModal(document.getElementById('admin-verify-code-modal')); openModal(document.getElementById('admin-confirm-redeem-modal')); } else { alert('驗證失敗'); } }).catch(() => { hideLoader(); alert('連線錯誤'); }); }
-        function handleFinalConfirmRedeem() { const employeeId = document.getElementById('admin-redeem-employee-id').value; showLoader(); const ownCup = document.getElementById('redeem-own-cup').value; fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'processRedemption', step: 'confirm', code: verificationCode, employeeId, ownCup }) }).then(r => r.json()).then(result => { hideLoader(); if(result.status === 'success') { alert('核銷成功'); closeModal(document.getElementById('admin-confirm-redeem-modal')); if(searchedPhone) handleAdminLookup(); } else { alert('核銷失敗'); } }).catch(() => { hideLoader(); alert('連線錯誤'); }); }
+        function handleVerifyRedeemCode() { const code = document.getElementById('admin-redeem-code-input').value; const employeeId = document.getElementById('admin-redeem-employee-id').value; if (!code || !employeeId) { alert('請輸入完整資訊'); return; } showLoader(); fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'processRedemption', step: 'verify', code, employeeId }) }).then(r => r.json()).then(result => { hideLoader(); if(result.status === 'success') { const data = result.data; console.log("核銷驗證後端回傳資料:", data); const backendOwnCup = data.ownCup || data['自帶杯'] || data.own_cup; const ownCupDisplay = backendOwnCup ? backendOwnCup : '無紀錄 (需檢查後端試算表)'; document.getElementById('admin-confirm-redeem-details').innerHTML = `<p>會員: ${data.customerName}</p><p>品項: ${data.item}</p><p>數量: ${data.amount}</p><p style='color:#cb9c65; font-weight:bold;'>是否為自帶杯: ${ownCupDisplay}</p>`; verificationCode = code; closeModal(document.getElementById('admin-verify-code-modal')); openModal(document.getElementById('admin-confirm-redeem-modal')); } else { alert('驗證失敗'); } }).catch(() => { hideLoader(); alert('連線錯誤'); }); }
+        function handleFinalConfirmRedeem() { const employeeId = document.getElementById('admin-redeem-employee-id').value; showLoader(); fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'processRedemption', step: 'confirm', code: verificationCode, employeeId }) }).then(r => r.json()).then(result => { hideLoader(); if(result.status === 'success') { alert('核銷成功'); closeModal(document.getElementById('admin-confirm-redeem-modal')); if(searchedPhone) handleAdminLookup(); } else { alert('核銷失敗'); } }).catch(() => { hideLoader(); alert('連線錯誤'); }); }
         function handleAdminSendCoupon() { const phone = document.getElementById('send-coupon-phone').value.trim(); const typeSelect = document.getElementById('send-coupon-type'); let type = typeSelect.value; const qty = parseInt(document.getElementById('send-coupon-qty').value); const targetMode = document.getElementById('send-target-mode').value; const expiryInput = document.getElementById('send-coupon-expiry').value; if (type === 'other') { const customName = document.getElementById('send-coupon-custom-name').value.trim(); if (!customName) { alert('請輸入優惠卷名稱'); return; } type = `other:${customName}`; } let payload = { action: 'sendCoupon', type, qty, employeeId: currentAdminId, targetMode, expiry: expiryInput, desc: document.getElementById('send-coupon-desc').value.trim() }; if (targetMode === 'phone') { if (!phone || !/^\d{10}$/.test(phone)) { alert('請輸入正確電話'); return; } payload.phone = phone; } else { payload.level = document.getElementById('send-coupon-level').value; } if (!type || !qty) { alert('請填寫完整'); return; } if (targetMode === 'level' && !confirm(`確定要派發給「${document.getElementById('send-coupon-level').selectedOptions[0].text}」嗎？`)) return; showLoader(); fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) }).then(r => r.json()).then(res => { hideLoader(); if(res.status === 'success') { alert('✅ 派發成功！'); closeModal(document.getElementById('admin-send-coupon-modal')); } else { alert('⚠️ 派發失敗：' + res.message); } }).catch(() => { hideLoader(); alert('連線錯誤'); }); }
 
         document.addEventListener('DOMContentLoaded', function() {
