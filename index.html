@@ -400,6 +400,11 @@
                             <li><strong>累積規則：</strong>於活動期間內，一週到櫃上核銷寄杯滿 4 天(需不同天)即可累積 1 點活動點數。</li>
                             <li><strong>兌換方式：</strong>點數可於下方直接兌換專屬好禮，兌換後將扣除對應點數。</li>
                         </ul>
+                        <div class="divider"></div>
+<p style="font-size: 0.75em; color: #888; text-align: left; line-height: 1.5; padding: 0 10px;">
+    <strong>注意事項：</strong><br>
+    本活動不得與其他優惠併用。商品數量以各門市實際可販售數量為準。詳細活動辦法依本公司公告為準。凡參與本活動，即視同承認及接受本活動注意事項及相關規定，本公司保有隨時修正、暫停或終止本活動之權利。若有未盡事宜，悉依本公司之相關公告辦理；本公司保留最終解釋及決定權利。
+</p>
                         <div class="event-points-display"><div style="font-size:0.9em; color:#aaa; margin-bottom:5px;">目前可用活動點數</div><div class="event-points-num" id="current-event-points">0</div></div>
                         <div class="divider"></div>
                         <h3 style="color:#f0f0f0; text-align:left; font-size:1.1em; margin-bottom:15px;">🎁 點數兌換專區</h3>
@@ -602,7 +607,12 @@
         const redeemableItems = [{ cost: 2, name: "精品皮革收納籃", image: "item_2pt.png" }, { cost: 3, name: "AMEDEI冰淇淋乙杯", image: "item_3pt.jpg" }, { cost: 6, name: "精品帆布袋", image: "item_6pt.png" }, { cost: 10, name: "精品禮盒", image: "item_10pt.png" }];
         
         // ★ 新增：特別活動獎品清單與變數
-        const eventPrizeItems = [ { cost: 1, name: "茶飲一杯", desc: "累積 1 點可兌換" }, { cost: 2, name: "Desbory 179元系列餅乾一盒", desc: "累積 2 點可兌換" }, { cost: 3, name: "精緻甜點一個", desc: "累積 3 點可兌換" }, { cost: 4, name: "豪華下午茶組", desc: "累積 4 點可兌換" } ];
+        const eventPrizeItems = [
+    { cost: 1, name: "Desobry 179元系列乙件", desc: "僅可兌換Desobry 179元系列乙件" },
+    { cost: 2, name: "蛋糕任選乙個", desc: "僅限外帶，不可使用自帶杯優惠及內用" },
+    { cost: 3, name: "精品手沖茶類乙壺", desc: "僅限外帶，不可使用自帶杯優惠及內用" },
+    { cost: 4, name: "下午茶組", desc: "中杯精品美式(可+20元升級拿鐵)+甜點任選乙顆，僅限外帶，不可使用自帶杯優惠及內用" }
+];
         let pendingEventPrizeItem = null, currentCalendarDate = new Date(), eventCheckInDates = [], currentEventPointsVal = 0;
 
         const CUSTOM_COUPON_IMG = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(`<svg width="120" height="120" xmlns="http://www.w3.org/2000/svg"><rect x="5" y="5" width="110" height="110" rx="15" ry="15" fill="none" stroke="#DAA520" stroke-width="3"/><text x="50%" y="42" dominant-baseline="middle" text-anchor="middle" font-size="36" fill="#DAA520" font-weight="bold" font-family="'Microsoft JhengHei', 'Heiti TC', sans-serif">專屬</text><text x="50%" y="82" dominant-baseline="middle" text-anchor="middle" font-size="36" fill="#DAA520" font-weight="bold" font-family="'Microsoft JhengHei', 'Heiti TC', sans-serif">優惠</text></svg>`);
