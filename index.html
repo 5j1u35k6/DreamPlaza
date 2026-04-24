@@ -868,7 +868,7 @@
                      let termsHtml = '<ul>';
                      const baseTerms = couponTerms[cType] || [];
                      baseTerms.forEach(term => { if (!term.includes('處於「已使用」')) termsHtml += `<li>${term}</li>`; });
-                     if (cDesc && cDesc !== 'undefined') termsHtml += `<li style="color:#fff; font-weight:bold; margin-top:5px;">特別說明：${cDesc}</li>`;
+                     if (cDesc && cDesc !== 'undefined') termsHtml += `<li style="color:#f0f0f0; font-weight:bold; margin-top:5px;">特別說明：${cDesc}</li>`;
                      termsHtml += '</ul>';
                      termsHtml += `<p style="color:#c0392b; font-weight:bold; font-size:1.1em; margin-top:15px; border-top:1px dashed #ddd; padding-top:10px;">處於「已使用」狀態的卷類無法再次使用（因顧客誤按而變為「已使用」狀態的卷類也無法再次使用）。</p>`;
 
