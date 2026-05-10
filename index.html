@@ -229,10 +229,60 @@
         .confirm-details p { margin: 10px 0; font-size: 1.1em; line-height: 1.6; text-align: left; }
         .confirm-details strong { color: #c0392b; }
 
-        #loading-modal { z-index: 3000; }
-        .loading-box { display: flex; flex-direction: column; align-items: center; gap: 15px; }
-        .loading-spinner { border: 5px solid #f3f3f3; border-top: 5px solid #6a1d7b; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; }
-        .loading-text { color: #fff; font-size: 1.2em; font-weight: bold; }
+        /* --- 全新 10 份金紫交替載入動畫 --- */
+#loading-modal { z-index: 3000; }
+.premium-loader-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+.loader-ring {
+    position: relative;
+    width: 70px;
+    height: 70px;
+}
+.loader-segment {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0; left: 0;
+}
+.loader-segment::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 6px;
+    height: 18px;
+    background-color: #333; /* 尚未載入的暗色底 */
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+/* 金色亮起狀態 */
+.loader-segment.active.gold::after {
+    background-color: #cb9c65;
+    box-shadow: 0 0 10px rgba(203,156,101,0.8);
+}
+/* 紫色亮起狀態 */
+.loader-segment.active.purple::after {
+    background-color: #6a1d7b;
+    box-shadow: 0 0 10px rgba(106,29,123,0.8);
+}
+.loading-text {
+    color: #cb9c65;
+    font-size: 1.2em;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+.loading-percent {
+    color: #aaaaaa;
+    font-size: 1em;
+    font-weight: normal;
+    margin-top: 5px;
+    font-family: monospace;
+}
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
         #qr-reader-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 4000; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; }
@@ -537,8 +587,25 @@
         </div>
 
         <div id="loading-modal" class="modal-overlay hidden">
-            <div class="loading-box"><div class="loading-spinner" style="border-top-color:#cb9c65;"></div><p class="loading-text" style="color:#cb9c65;">資料處理中，請稍候...</p></div>
+    <div class="premium-loader-container">
+        <div class="loader-ring" id="loader-ring">
+            <div class="loader-segment gold" style="transform: rotate(0deg);"></div>
+            <div class="loader-segment purple" style="transform: rotate(36deg);"></div>
+            <div class="loader-segment gold" style="transform: rotate(72deg);"></div>
+            <div class="loader-segment purple" style="transform: rotate(108deg);"></div>
+            <div class="loader-segment gold" style="transform: rotate(144deg);"></div>
+            <div class="loader-segment purple" style="transform: rotate(180deg);"></div>
+            <div class="loader-segment gold" style="transform: rotate(216deg);"></div>
+            <div class="loader-segment purple" style="transform: rotate(252deg);"></div>
+            <div class="loader-segment gold" style="transform: rotate(288deg);"></div>
+            <div class="loader-segment purple" style="transform: rotate(324deg);"></div>
         </div>
+        <div style="text-align: center;">
+            <div class="loading-text">載入中 loading<span id="loading-dots">...</span></div>
+            <div class="loading-percent" id="loading-percent-text">0%</div>
+        </div>
+    </div>
+</div>
 
         <div id="my-coupons-modal" class="modal-overlay hidden">
             <div class="modal-content">
@@ -644,18 +711,59 @@
             if (el) el.addEventListener(event, func);
         }
 
-        let globalLoaderTimeout = null;
-        function showLoader() { 
-            const el = document.getElementById('loading-modal'); 
-            if(el) el.classList.remove('hidden'); 
-            if(globalLoaderTimeout) clearTimeout(globalLoaderTimeout);
-            globalLoaderTimeout = setTimeout(() => { hideLoader(); }, 10000); 
+        let fakeLoaderInterval = null;
+let dotInterval = null;
+
+function showLoader() { 
+    const el = document.getElementById('loading-modal'); 
+    if(el) el.classList.remove('hidden'); 
+    
+    // 1. 重置所有燈號與文字
+    const segments = document.querySelectorAll('.loader-segment');
+    segments.forEach(seg => seg.classList.remove('active'));
+    document.getElementById('loading-percent-text').textContent = "0%";
+    
+    let progress = 0;
+    
+    // 2. 「載入中...」的點點動畫，讓畫面看起來有生命力
+    let dotCount = 0;
+    const dotsEl = document.getElementById('loading-dots');
+    clearInterval(dotInterval);
+    dotInterval = setInterval(() => {
+        dotCount = (dotCount + 1) % 4;
+        if(dotsEl) dotsEl.textContent = ".".repeat(dotCount);
+    }, 400);
+
+    // 3. 開始跑 10 份的模擬進度條
+    clearInterval(fakeLoaderInterval);
+    fakeLoaderInterval = setInterval(() => {
+        // 最多只跑到第 9 格 (90%)，留下最後 10% 等待真實資料載入完成
+        if (progress < 9) { 
+            segments[progress].classList.add('active');
+            progress++;
+            document.getElementById('loading-percent-text').textContent = (progress * 10) + "%";
         }
-        function hideLoader() { 
-            const el = document.getElementById('loading-modal'); 
-            if(el) el.classList.add('hidden'); 
-            if(globalLoaderTimeout) clearTimeout(globalLoaderTimeout);
-        }
+    }, 400); // 這裡設定每 0.4 秒亮一格，跑到 90% 大約需要 3.6 秒
+}
+
+function hideLoader() { 
+    // 1. 資料處理完畢！瞬間把最後一格點亮，達到 100%
+    const segments = document.querySelectorAll('.loader-segment');
+    if(segments.length > 0) {
+        segments[9].classList.add('active');
+        const pctEl = document.getElementById('loading-percent-text');
+        if(pctEl) pctEl.textContent = "100%";
+    }
+    
+    clearInterval(fakeLoaderInterval);
+    clearInterval(dotInterval);
+    
+    // 2. 刻意停留 0.3 秒，讓顧客眼角餘光「確認」有跑到 100%，再關閉視窗 (極度提升安心感)
+    setTimeout(() => {
+        const el = document.getElementById('loading-modal'); 
+        if(el) el.classList.add('hidden'); 
+    }, 300);
+}
         function openModal(modal) { if(modal) modal.classList.remove('hidden'); }
         function closeModal(modal) { if(modal) modal.classList.add('hidden'); }
         function showPage(page) { document.querySelectorAll('.page-section').forEach(p => p.classList.add('hidden')); if(page) page.classList.remove('hidden'); }
