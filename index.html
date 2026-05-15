@@ -6,10 +6,9 @@
     <title>門市會員專區</title>
     <link rel="icon" href="favicon.png" type="image/png" sizes="32x32"> 
     
-    <!-- 載入必要的外部套件 -->
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js" type="text/javascript"></script>
     <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script> <!-- ★ 新增：產生 QR Code 的套件 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script> 
     
     <style>
         /* --- 基礎設定 --- */
@@ -77,7 +76,7 @@
         .btn-outline-red { background-color: transparent; color: #c0392b; border: 1px solid #c0392b; padding: 12px; font-size: 15px; border-radius: 8px; cursor: pointer; width: 100%; display: block; margin-top: 30px; margin-bottom: 5px; transition: all 0.2s; font-weight: bold; box-sizing: border-box; }
         .btn-outline-red:hover { background-color: #fff0f0; }
         .hidden { display: none !important; }
-
+        
         /* Modal & Popups */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); justify-content: center; align-items: center; z-index: 2000; }
         .modal-overlay:not(.hidden) { display: flex; }
@@ -272,6 +271,10 @@
         .event-points-display { text-align: center; margin: 20px 0; padding: 15px; background: #2a2a2a; border-radius: 10px; border: 1px dashed #cb9c65; }
         .event-points-num { font-size: 2.5em; font-weight: bold; color: #cb9c65; }
         .event-rules-list { font-size: 0.85em; color: #aaa; text-align: left; line-height: 1.6; margin-bottom: 15px; padding-left: 20px; }
+        
+        /* ★ 新增：等待提示動畫 */
+        @keyframes pulse-text { 0% { opacity: 0.4; } 50% { opacity: 1; } 100% { opacity: 0.4; } }
+        .waiting-text { color: #aaaaaa; font-size: 0.95em; margin-top: 15px; animation: pulse-text 1.5s infinite; letter-spacing: 1px; }
     </style>
 </head>
 <body>
@@ -413,7 +416,6 @@
                         <h3 style="color:#f0f0f0; text-align:left; font-size:1.1em; margin-bottom:15px;">🎁 點數兌換專區</h3>
                         <div id="event-prizes-list"></div>
                         
-                        <!-- ★ 新增：活動保障條文 -->
                         <div class="divider"></div>
                         <p style="font-size: 0.75em; color: #888; text-align: left; line-height: 1.5; padding: 0 10px;">
                             <strong>注意事項：</strong><br>
@@ -471,7 +473,6 @@
                 <div class="header-bar"><div class="greeting-text"><span id="admin-id-greeting"></span> <span id="admin-time-greeting">您好</span></div><button id="admin-logout-button" class="btn-logout">登出</button></div>
                 <div class="admin-actions">
                     <button id="admin-add-voucher-btn" class="btn btn-secondary">新增寄杯</button>
-                    <!-- ★ 更新：改為打開掃描器 -->
                     <button id="admin-redeem-voucher-btn" class="btn btn-secondary">掃描核銷寄杯</button>
                 </div>
                 <div class="admin-actions" style="margin-top: 15px;">
@@ -548,7 +549,6 @@
             </div>
         </div>
 
-        <!-- ★ 更新：全新金紫交替載入畫面 -->
         <div id="loading-modal" class="modal-overlay hidden">
             <div class="premium-loader-container">
                 <div class="loader-ring" id="loader-ring">
@@ -586,7 +586,6 @@
             </div>
         </div>
         
-        <!-- ★ 更新：顧客出示 QR Code 視窗 -->
         <div id="show-code-modal" class="modal-overlay hidden">
             <div class="modal-content">
                 <span class="close-button" onclick="closeModal(this.parentElement.parentElement)">&times;</span>
@@ -596,6 +595,9 @@
                         <canvas id="qr-code-canvas"></canvas>
                     </div>
                     <div id="verification-code-display" style="font-size: 1.5em; font-weight: bold; color: #cb9c65; letter-spacing: 2px; font-family: monospace;"></div>
+                    
+                    <div id="verification-status-text" class="waiting-text">等待店員掃描與核銷...</div>
+                    
                     <p style="color: #c0392b; font-size: 0.9em; margin-top: 15px;">有效時間倒數 <span id="countdown-timer">03:00</span></p>
                     <button class="btn btn-secondary" style="margin-top: 20px; background-color: #444; color: #555;" onclick="closeModal(this.parentElement.parentElement)">關閉視窗</button>
                 </div>
@@ -618,7 +620,6 @@
         
         <div id="add-voucher-modal" class="modal-overlay hidden"><div class="modal-content"><span class="close-button" onclick="closeModal(this.parentElement.parentElement)">&times;</span><h2 class="modal-title">新增寄杯</h2><div class="form-grid"><div class="form-group"><label for="add-voucher-phone">會員電話號碼</label><input type="tel" id="add-voucher-phone" class="form-input" placeholder="請輸入顧客10碼電話"></div><div class="form-group"><label for="add-voucher-item">寄杯品項</label><select id="add-voucher-item" class="form-input"><option value="">-- 請選擇品項 --</option><optgroup label="咖啡"><option value="咖啡-冰精品美式">冰精品美式</option><option value="咖啡-熱精品美式">熱精品美式</option><option value="咖啡-冰精品拿鐵">冰精品拿鐵</option><option value="咖啡-熱精品拿鐵">熱精品拿鐵</option></optgroup><optgroup label="手沖"><option value="手沖-冰瓜地馬拉">冰瓜地馬拉</option><option value="手沖-熱瓜地馬拉">熱瓜地馬拉</option><option value="手沖-冰哥倫比亞">冰哥倫比亞</option><option value="手沖-熱哥倫比亞">熱哥倫比亞</option><option value="手沖-冰衣索比亞">冰衣索比亞</option><option value="手沖-熱衣索比亞">熱衣索比亞</option></optgroup><optgroup label="純茶"><option value="純茶-冰皇家伯爵紅茶">冰皇家伯爵紅茶</option><option value="純茶-熱皇家伯爵紅茶">皇家伯爵紅茶</option><option value="純茶-冰慢焙金烏龍">冰慢焙金烏龍</option><option value="純茶-熱慢焙金烏龍">熱慢焙金烏龍</option></optgroup><optgroup label="風味"><option value="風味-冰特調可可飲">冰特調可可飲</option><option value="風味-熱特調可可飲">熱特調可可飲</option></optgroup></select></div><div class="form-group"><label for="add-voucher-amount">新增數量</label><input type="number" id="add-voucher-amount" class="form-input" placeholder="請輸入杯數" min="1"></div><div class="form-group"><label for="add-voucher-own-cup">是否為自帶杯</label><select id="add-voucher-own-cup" class="form-input"><option value="否">否</option><option value="是">是</option></select></div><div class="form-group"><label for="add-voucher-order-id">訂單編號</label><input type="text" id="add-voucher-order-id" class="form-input" placeholder="輸入訂單編號8碼"></div></div><button id="confirm-add-voucher-btn" class="btn btn-primary" style="margin-top:20px;">確認</button></div></div>
         
-        <!-- ★ 更新：員工手動輸入備案視窗 -->
         <div id="admin-verify-code-modal" class="modal-overlay hidden"><div class="modal-content"><span class="close-button" onclick="closeModal(this.parentElement.parentElement)">&times;</span><h2 class="modal-title">手動輸入核銷碼</h2><div class="form-group"><label for="admin-redeem-code-input">會員驗證碼 (顧客畫面上的6位數字)</label><input type="number" id="admin-redeem-code-input" class="form-input" placeholder="請輸入6位數字"></div><button id="verify-redeem-code-btn" class="btn btn-primary" style="margin-top:20px;">驗證</button></div></div>
         
         <div id="admin-confirm-redeem-modal" class="modal-overlay hidden"><div class="modal-content"><h2 class="modal-title" style="color:#cb9c65;">請確認核銷資訊</h2>
@@ -626,7 +627,6 @@
 <div class="confirm-buttons"><button id="cancel-redeem-btn" class="btn btn-secondary">取消</button><button id="final-confirm-redeem-btn" class="btn btn-primary">確認核銷</button></div></div></div>
         <div id="admin-confirm-add-modal" class="modal-overlay hidden"><div class="modal-content"><h2 class="modal-title" style="color:#cb9c65;">請確認新增資訊</h2><div id="admin-confirm-add-details" class="confirm-details"></div><div class="confirm-buttons"><button id="cancel-add-btn" class="btn btn-secondary">取消</button><button id="final-confirm-add-btn" class="btn btn-primary">新增</button></div></div></div>
 
-        <!-- ★ 更新：掃描器容器 -->
         <div id="qr-reader-container" class="hidden">
             <p style="color: white; margin-bottom: 15px; font-size: 1.2em; font-weight: bold;" id="qr-reader-title">請掃描 QR Code</p>
             <div id="qr-reader"></div>
@@ -646,12 +646,10 @@
         const currentYear = new Date().getFullYear();
         
         const CAN_SEND_COUPON_ADMINS = ['10427091']; 
-        // ★ 新增：員工名稱對照表
-        const EMPLOYEES = { '10427091': '7091 Arno', '10431118': '1118 Carol', '10425120': '5120 Elly', '10431938': '1938 Jewel', '10440316': '0316 Ury', '10426630': '6630 Elaine' };
+        const EMPLOYEES = { '10427091': '7091 Arno', '10431118': '1118 Carol', '10416377': '6377 Eric', '10425120': '5120 Elly', '10431938': '1938 Jewel', '10413569': '3569 Summer', '10426630': '6630 Elaine' };
 
         const redeemableItems = [{ cost: 2, name: "精品皮革收納籃", image: "item_2pt.png" }, { cost: 3, name: "AMEDEI冰淇淋乙杯", image: "item_3pt.jpg" }, { cost: 6, name: "精品帆布袋", image: "item_6pt.png" }, { cost: 10, name: "精品禮盒", image: "item_10pt.png" }];
         
-        // ★ 更新後：特別活動獎品清單與說明
         const eventPrizeItems = [ 
             { cost: 1, name: "Desobry 179元系列乙件", desc: "僅可兌換Desobry 179元系列乙件" }, 
             { cost: 2, name: "蛋糕任選乙個", desc: "僅限外帶，不可使用自帶杯優惠及內用" }, 
@@ -676,7 +674,6 @@
         let verificationCode = null, countdownTimer = null, pollingInterval = null, pendingAddVoucherData = null, pendingPointRedeemItem = null, pendingCouponUseId = null;
         let currentAnnualPoints = 0, currentLevelIndex = 0, globalUsedCoupons = [], globalExtraCoupons = [], isCouponsLoaded = false;
         
-        // ★ 更新：掃描器模式變數
         let html5QrCodeScanner = null, scannerMode = 'none'; 
         
         let currentCouponTab = 'unused';
@@ -694,7 +691,6 @@
             if (el) el.addEventListener(event, func);
         }
 
-        // --- ★ 更新：聰明載入動畫 ---
         let fakeLoaderInterval = null;
         let dotInterval = null;
 
@@ -729,7 +725,18 @@
         }
 
         function openModal(modal) { if(modal) modal.classList.remove('hidden'); }
-        function closeModal(modal) { if(modal) modal.classList.add('hidden'); }
+        
+        // ★ 更新：強制在關閉 modal 時清除背景計時器，防止重複觸發
+        function closeModal(modal) { 
+            if(modal) {
+                modal.classList.add('hidden'); 
+                if (modal.id === 'show-code-modal') {
+                    if (pollingInterval) clearInterval(pollingInterval);
+                    if (countdownInterval) clearInterval(countdownInterval);
+                }
+            }
+        }
+        
         function showPage(page) { document.querySelectorAll('.page-section').forEach(p => p.classList.add('hidden')); if(page) page.classList.remove('hidden'); }
         
         function updateGreeting(timeId, nameId, nameText) { 
@@ -940,7 +947,6 @@
                      let termsHtml = '<ul>';
                      const baseTerms = couponTerms[cType] || [];
                      baseTerms.forEach(term => { if (!term.includes('處於「已使用」')) termsHtml += `<li>${term}</li>`; });
-                     // ★ 更新：白色的特別說明
                      if (cDesc && cDesc !== 'undefined') termsHtml += `<li style="color:#fff; font-weight:bold; margin-top:5px;">特別說明：${cDesc}</li>`;
                      termsHtml += '</ul>';
                      termsHtml += `<p style="color:#c0392b; font-weight:bold; font-size:1.1em; margin-top:15px; border-top:1px dashed #ddd; padding-top:10px;">處於「已使用」狀態的卷類無法再次使用（因顧客誤按而變為「已使用」狀態的卷類也無法再次使用）。</p>`;
@@ -1031,7 +1037,7 @@
             }
         }
 
-        // --- ★ 更新：產生 QR Code 供店員掃描 ---
+        // --- ★ 產生 QR Code 供店員掃描 ---
         function handleVoucherRedeemClick(item, maxAmount, phone, nameInfo, ownCupStatus) {
              const amount = prompt(`您要核銷幾杯「${item}」？\n(此品項還剩下 ${maxAmount} 杯可核銷)`, 1);
              if (amount && parseInt(amount) > 0 && parseInt(amount) <= maxAmount) {
@@ -1043,6 +1049,13 @@
                      if (res.status === 'success') {
                          document.getElementById('verification-code-display').textContent = res.code;
                          
+                         // ★ 更新：開啟時恢復為等待字樣
+                         const statusText = document.getElementById('verification-status-text');
+                         if(statusText) {
+                             statusText.innerHTML = "等待店員掃描與核銷...";
+                             statusText.className = "waiting-text";
+                         }
+
                          // 產生 QR Code 畫面
                          new QRious({
                             element: document.getElementById('qr-code-canvas'),
@@ -1063,12 +1076,22 @@
 
         function startPollingForRedemption(code) {
             if(pollingInterval) clearInterval(pollingInterval); let attempts = 0;
+            // ★ 更新：將輪詢間隔縮短為 1500 毫秒 (1.5秒)
             pollingInterval = setInterval(() => {
-                attempts++; if(attempts > 60) { clearInterval(pollingInterval); return; }
+                attempts++; if(attempts > 120) { clearInterval(pollingInterval); return; } // 因為秒數減半，嘗試次數加倍
                 fetch(`${SCRIPT_URL}?action=checkRedeemStatus&code=${code}`).then(r => r.json()).then(res => {
                     if(res.status === 'redeemed') {
                         clearInterval(pollingInterval); clearInterval(countdownInterval);
-                        const displayDiv = document.getElementById('verification-code-display'); if(displayDiv) { displayDiv.innerHTML = "<span style='color:#27ae60;'>✔ 核銷成功</span>"; displayDiv.style.fontSize = "2.5em"; } document.getElementById('countdown-timer').parentElement.style.display = 'none';
+                        const displayDiv = document.getElementById('verification-code-display'); 
+                        if(displayDiv) { 
+                            displayDiv.innerHTML = "<span style='color:#27ae60;'>✔ 核銷成功</span>"; 
+                            displayDiv.style.fontSize = "2.5em"; 
+                        } 
+                        // 清除等待狀態的文字與動畫
+                        const statusText = document.getElementById('verification-status-text');
+                        if(statusText) { statusText.innerHTML = ""; statusText.className = ""; }
+
+                        document.getElementById('countdown-timer').parentElement.style.display = 'none';
                         if(currentCustomerPhone) { fetch(`${SCRIPT_URL}?action=query&phone=${currentCustomerPhone}`).then(r=>r.json()).then(result => { if(result.found) { document.getElementById('voucher-balance').textContent = result.data.vouchers; if(document.getElementById('vouchers-page-balance')) document.getElementById('vouchers-page-balance').textContent = result.data.vouchers; if(document.getElementById('vouchers-page-balance')) document.getElementById('vouchers-page-balance').textContent = result.data.vouchers; document.getElementById('points-balance').textContent = result.data.points; if(document.getElementById('points-page-balance')) document.getElementById('points-page-balance').textContent = result.data.points; if(document.getElementById('points-page-balance')) document.getElementById('points-page-balance').textContent = result.data.points; } }); }
                         setTimeout(() => { 
                             closeModal(document.getElementById('show-code-modal')); 
@@ -1076,7 +1099,7 @@
                         }, 1500);
                     }
                 }).catch(() => {});
-            }, 3000);
+            }, 1500); 
         }
         
         function openRedeemPointsPage() { 
@@ -1192,7 +1215,6 @@
 
         function handleVerifyStaffCodeForCoupon() { const inputCode = document.getElementById('staff-code-input').value; if (inputCode === '287719' && pendingCouponUseId) { showLoader(); fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'redeemCoupon', phone: currentCustomerPhone, couponId: pendingCouponUseId, title: '優惠卷核銷' }) }).then(r => r.json()).then(res => { hideLoader(); if (res.status === 'success') { globalUsedCoupons.push(pendingCouponUseId); alert('核銷成功！'); closeModal(document.getElementById('staff-verify-modal')); updateMemberLevelUI(currentAnnualPoints); openCouponsModal(); } else { alert('核銷失敗'); } }).catch(err => { hideLoader(); alert('連線錯誤'); }); } else { alert('核銷碼錯誤'); } }
         
-        // --- ★ 更新：共用的 QR 掃描器邏輯 ---
         function openQRScanner() { 
             const qrContainer = document.getElementById('qr-reader-container'); if(!qrContainer) return;
             qrContainer.classList.remove('hidden'); 
@@ -1224,7 +1246,6 @@
         
         function closeQRScanner() { const qrContainer = document.getElementById('qr-reader-container'); if (html5QrCodeScanner) { html5QrCodeScanner.stop().then(() => { qrContainer.classList.add('hidden'); }).catch(() => { qrContainer.classList.add('hidden'); }); } else { qrContainer.classList.add('hidden'); } }
         
-        // --- ★ 新增：員工確認 QR Code 核銷資訊 ---
         function verifyCodeFromQR(code) {
             if (!currentAdminId) {
                 alert('系統逾時，請重新登入管理員帳號');
@@ -1248,7 +1269,6 @@
             }).catch(() => { hideLoader(); alert('連線錯誤'); });
         }
 
-        // ★ 更新：自動帶入員工 ID 核銷
         function handleVerifyRedeemCode() { 
             const code = document.getElementById('admin-redeem-code-input').value; 
             if (!code) { alert('請輸入核銷碼'); return; } 
@@ -1256,20 +1276,33 @@
             verifyCodeFromQR(code); 
         }
 
+        // ★ 更新：加入店員端防連點保護機制
         function handleFinalConfirmRedeem() { 
+            const btn = document.getElementById('final-confirm-redeem-btn');
+            btn.disabled = true;
+            btn.textContent = '處理中...';
             showLoader(); 
-            fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'processRedemption', step: 'confirm', code: verificationCode, employeeId: currentAdminId }) }).then(r => r.json()).then(result => { 
+            
+            fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'processRedemption', step: 'confirm', code: verificationCode, employeeId: currentAdminId }) })
+            .then(r => r.json()).then(result => { 
                 hideLoader(); 
+                btn.disabled = false;
+                btn.textContent = '確認核銷';
+                
                 if(result.status === 'success') { 
                     alert('✅ 核銷成功'); closeModal(document.getElementById('admin-confirm-redeem-modal')); 
                     if(searchedPhone) handleAdminLookup(); 
                 } else { alert('核銷失敗: ' + result.message); } 
-            }).catch(() => { hideLoader(); alert('連線錯誤'); }); 
+            }).catch(() => { 
+                hideLoader(); 
+                btn.disabled = false;
+                btn.textContent = '確認核銷';
+                alert('連線錯誤'); 
+            }); 
         }
 
         function handleAdminLookup() { const phone = document.getElementById('lookup-phone-input').value.trim(); if (!/^\d{10}$/.test(phone)) { alert('電話號碼格式錯誤'); return; } showLoader(); fetch(`${SCRIPT_URL}?action=query&phone=${phone}`).then(r => r.json()).then(result => { hideLoader(); if (result.status === 'success') { if (result.found) { searchedPhone = result.data; document.getElementById('result-name-display').textContent = `${result.data.lastName}${result.data.title}`; const ap = parseInt(result.data.annualPoints) || 0; let levelName = '可可白賞'; if (ap >= LEVEL_THRESHOLDS.LV3) levelName = '可可金賞'; else if (ap >= LEVEL_THRESHOLDS.LV2) levelName = '可可銀賞'; else if (ap >= LEVEL_THRESHOLDS.LV1) levelName = '可可銅賞'; document.getElementById('result-level-display').textContent = levelName; document.getElementById('result-points').textContent = result.data.points; document.getElementById('result-vouchers').textContent = result.data.vouchers; document.getElementById('lookup-results').classList.remove('hidden'); } else { searchedPhone = null; document.getElementById('lookup-results').classList.add('hidden'); alert('查無此會員資料。'); } } else { searchedPhone = null; alert('系統錯誤'); } }).catch(err => { hideLoader(); alert('連線錯誤'); }); }
         
-        // ★ 更新：移除員工編號的清空邏輯
         function openAddVoucherModal() { 
             const phoneInput = document.getElementById('add-voucher-phone'); 
             if (searchedPhone && searchedPhone.phone) phoneInput.value = searchedPhone.phone; 
@@ -1280,7 +1313,6 @@
             openModal(document.getElementById('add-voucher-modal')); 
         }
         
-        // ★ 更新：直接帶入 currentAdminId，並顯示經辦人名稱
         function handleConfirmAddVoucher() { 
             const phone = document.getElementById('add-voucher-phone').value.trim(); 
             const item = document.getElementById('add-voucher-item').value; 
@@ -1396,23 +1428,20 @@
             safeBindListener('cancel-event-prize-btn', 'click', () => closeModal(document.getElementById('event-prize-confirm-modal')));
             safeBindListener('staff-confirm-event-prize-btn', 'click', handleStaffConfirmEventPrize);
 
-            // ★ 更新：打開 QR Scanner 前設定模式
             safeBindListener('add-points-btn', 'click', () => {
                 scannerMode = 'addPoint';
                 document.getElementById('qr-reader-title').textContent = '請掃描集點卡 QR Code';
-                document.getElementById('manual-input-fallback-btn').style.display = 'none'; // 集點不需要手動輸入備案
+                document.getElementById('manual-input-fallback-btn').style.display = 'none'; 
                 openQRScanner();
             });
             
-            // ★ 更新：店員掃描核銷寄杯
             safeBindListener('admin-redeem-voucher-btn', 'click', () => {
                 scannerMode = 'redeemVoucher';
                 document.getElementById('qr-reader-title').textContent = '請掃描顧客畫面上的核銷 QR Code';
-                document.getElementById('manual-input-fallback-btn').style.display = 'block'; // 核銷允許切換手動輸入
+                document.getElementById('manual-input-fallback-btn').style.display = 'block'; 
                 openQRScanner();
             });
             
-            // ★ 新增：切換手動輸入備案
             safeBindListener('manual-input-fallback-btn', 'click', () => {
                 closeQRScanner();
                 document.getElementById('admin-redeem-code-input').value = '';
@@ -1444,9 +1473,9 @@
             safeBindListener('cancel-add-btn', 'click', () => closeModal(document.getElementById('admin-confirm-add-modal')));
             safeBindListener('final-confirm-add-btn', 'click', handleFinalAddVoucher);
             
-            safeBindListener('verify-redeem-code-btn', 'click', handleVerifyRedeemCode); // ★ 更新：手動驗證
+            safeBindListener('verify-redeem-code-btn', 'click', handleVerifyRedeemCode); 
             safeBindListener('cancel-redeem-btn', 'click', () => closeModal(document.getElementById('admin-confirm-redeem-modal')));
-            safeBindListener('final-confirm-redeem-btn', 'click', handleFinalConfirmRedeem); // ★ 更新：自動帶員工ID
+            safeBindListener('final-confirm-redeem-btn', 'click', handleFinalConfirmRedeem); 
             
             safeBindListener('cancel-point-redeem-btn', 'click', () => { closeModal(document.getElementById('point-redeem-confirm-modal')); openRedeemPointsPage(); }); 
             safeBindListener('staff-confirm-point-redeem-btn', 'click', handleStaffConfirmPointRedeem);
@@ -1456,7 +1485,12 @@
             safeBindListener('verify-staff-code-btn', 'click', handleVerifyStaffCodeForCoupon);
             safeBindListener('close-qr-reader', 'click', closeQRScanner);
             
-            document.querySelectorAll('.modal-overlay').forEach(modal => { modal.addEventListener('click', e => { if (e.target === modal) closeModal(modal); }); const closeBtn = modal.querySelector('.close-button'); if (closeBtn) closeBtn.addEventListener('click', () => closeModal(modal)); });
+            // ★ 修改 modal 背景點擊行為，統一交給 closeModal 處理清理工作
+            document.querySelectorAll('.modal-overlay').forEach(modal => { 
+                modal.addEventListener('click', e => { 
+                    if (e.target === modal) closeModal(modal); 
+                }); 
+            });
             
             document.querySelectorAll('.tab-btn').forEach(btn => { 
                 btn.addEventListener('click', (e) => { 
